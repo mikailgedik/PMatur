@@ -1,0 +1,177 @@
+% !TeX spellcheck = en_US
+\documentclass[10pt,a4paper,titlepage]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage[left=2.00cm, right=2.00cm, top=2.00cm, bottom=2.00cm]{geometry}
+\usepackage{tikz}
+\usepackage{tikz-uml}
+
+%Makes index browsable in pdf viewers and shows index in sidebar
+\usepackage[bookmarks]{hyperref}
+\author{Mikail Gedik}
+\title{Thesis Paper}
+\begin{document}
+	\pagenumbering{roman}
+	\maketitle
+	\tableofcontents
+	\clearpage
+	\pagenumbering{arabic}
+	\section{Abstract}
+	This paper tackles the calculation of a few selected fractals and shines light on the core aspects I have implemented and furthermore optimized to use all the resources provided by the computer. My journey begins at a single threaded Java program and ends in a multi threaded C application able to make use graphics cards. Additionally, I will make an easy-to use yet powerful UI, which will enable even tech-unfamiliar people to use my software.
+	\subsection{Program Capabilities \& Expectations}
+	Here I will be listing all capabilities my program should have, from easiest to hardest.
+	\subsection{General}
+	\subsubsection{Operating System Independence}
+	As a Linux user, I am heavily outnumbered by Windows and Mac users. Because of this, my software has to run on the other platforms, or else very few people will be able to test or run my program. Due to me beginning the project in Java, this will only become an issue when switching to C++. I will be using the Vulkan API to use video cards, which is also platform independent and shouldn't cause any issues.
+	\subsection{Backend}
+	\subsubsection{Basic Java Single Threaded Mandelbrot Set Calculation}
+	The first goal is to make a simple Java program, which will calculate the Mandelbrot Set and output the result into a file. It is not yet intended to be structurally divided and good as shown in INSERT\_IMAGE\_NAME, but more closely together as there are yet not enough parts to separate the code.\\
+	Next up would be the implementation of the settings using a simple database like a list.
+	\subsubsection{Basic Java Single Threaded Mandelbrot Set Calculation}
+	\subsection{Windowed Frontend}
+	\subsection{Other Known Programs}
+	
+	
+	\section{Program Structure}
+	
+%	\begin{tikzpicture}
+%		\begin{umlpackage}[x=0,y=0]{package-name}
+%		\end{umlpackage}
+%	\end{tikzpicture}
+	
+	My program is separated in two halves, the front- and backend. While the latter is autonomous, the former is dependent on the backend, as it must know its interface, which is the connecting bridge between them. The front-end can request or order a command through a command string or an integer, i. e. a character sequence or a number. The backend answer these with a command result, which may also be an image.\\
+	Because the backend is detached from the front-end, I may also develop multiple front-ends for different needs. The front-end in the diagram below shows a possible version of window-oriented front-end, which is relatively modern and user-friendly, but for example useless in a command line environment. Thus I see the need to develop different front-ends.
+	
+	\begin{center}
+		\begin{tikzpicture}
+			%Front/Backend-connection
+			\draw[red, ultra thick, <-] (5,6.5) -- (7,6.5);
+			\node[above, align=center] at (6,6.5) {Command\\String};
+			
+			\draw[red, ultra thick, <-] (5,5) -- (7,5);
+			\node[above, align=center] at (6,5) {Command\\Integer};
+			
+			\draw[red, ultra thick, ->] (5,3.5) -- (7,3.5);
+			\node[below, align=center] at (6,3.5) {Command\\Result};
+			
+			\draw[red, ultra thick, ->] (5,2) -- (7,2);
+			\node[below, align=center] at (6,2) {Image\\Result};
+			
+			%Backend
+			\draw (0,0) rectangle (5,8);
+			\node[above] at (2.5, 8) {\textbf{Backend}};
+			
+			%Interface
+			\draw (4,1) rectangle (5, 7);
+			\node[rotate = 90] at(4.5, 4) {Backend Interface};
+			
+			%Settings
+			\draw (.5,7.2) rectangle (4.5, 7.8);
+			\node at (2.5, 7.5) {Settings};
+			
+			%Fractal calculator
+			\draw (1.5,4) rectangle (3.5, 6.5);
+			\node[align=center] at (2.5, 5.25) {Fractal\\Calculator};
+			
+			%Image render
+			\draw (1.5,1) rectangle (3.5, 3.5);
+			\node[align=center] at (2.5, 2.25) {Image\\Render};
+			
+			%File handling
+			\draw (0,1) rectangle (1, 7);
+			\node[rotate = 90] at(.5, 4) {File Handler};
+			
+			%Arrows
+			%Settings-Frac
+			\draw[ultra thick, ->] (2.5, 7.2) -- (2.5, 6.5);
+			%Int-Frac
+			\draw[ultra thick, <-] (3.5, 5.5) -- (4, 5.5);
+			%Frac-Image
+			\draw[ultra thick, ->]  (2.5, 4) -- (2.5, 3.5);
+			%Img-Int
+			\draw[ultra thick, ->]  (3.5, 2.5) -- (4, 2.5);
+			%Frac-File
+			\draw[ultra thick, <->] (1.5, 5.5) -- (1, 5.5);
+			%Image-File
+			\draw[ultra thick, ->] (1.5, 2.5) -- (1, 2.5);
+			%Settings-Int
+			\draw[ultra thick, ->] (4, 6.5) -- (3.75, 6.5) -- (3.75, 7.2); 
+			%Int-File
+			\draw[ultra thick, <->] (4.5, 1) -- (4.5,.5) -- (.5,.5) -- (.5, 1);
+			
+			%File system
+			\draw[green, ultra thick, dashed, ->] (-.25, 3.5) -- (.25, 3.5);
+			\draw[green, ultra thick, dashed, <-] (-.25, 4.5) -- (.25, 4.5);
+			\node[rotate = 90] at (-.5, 4) {File System};
+			
+			%Frontend
+			\draw (7,0) rectangle (12,8);
+			\node[above] at (9.5, 8) {\textbf{Windowed Front-end}};
+			
+			%Interface
+			\draw (7,1) rectangle (8, 7);
+			\node[rotate = 90] at(7.5, 4) {Front-end Interface};
+			
+			%Main
+			\draw (7.25,7.2) rectangle (11.75, 7.8);
+			\node at (9.5, 7.5) {Main/Frontend-controller};
+			
+			%Window
+			\draw (8.5,4) rectangle (11.75, 6.5);
+			\node[align=center] at (10.125, 5.25) {Window};
+			
+			%Control Panels
+			\draw (8.5,1) rectangle (10.5, 3.5);
+			\node[align=center] at (9.5, 2.25) {Control\\Panels};
+			
+			%Listener
+			\draw (11,1) rectangle (12, 3.5);
+			\node[rotate = 90] at(11.5, 2.25) {Listener};
+			
+			%Arrows
+			%Main-Win
+			\draw[ultra thick, <->] (10.125 ,7.2) -- (10.125, 6.5);
+			%List-Win
+			\draw[ultra thick, ->] (11.5, 3.5) -- (11.5,4);
+			%Ctr-Win
+			\draw[ultra thick, <->] (9.5, 3.5) -- (9.5, 4);
+			%Main-Interface
+			\draw[ultra thick, <->] (8, 6.75) -- (8.5, 6.75) -- (8.5, 7.2);
+			
+			%Ctr-Interface
+			\draw[ultra thick, <-] (8, 2.25) -- (8.5, 2.25);
+			
+			%Keyboard/Mouse
+			\draw[green, ultra thick, dashed, ->] (11.5, 5.25) -- (12.25,5.25);
+			\node[rotate = 90] at (12.5, 5.25) {Display};
+			
+			\draw[green, ultra thick, dashed, <-] (11.75, 2.25) -- (12.25, 2.25);
+			\node[rotate = 90] at (12.5, 2.25) {Keyboard/Mouse};
+		\end{tikzpicture}
+	\end{center}
+	\subsection{Backend}
+	The backend consists of multiple components or modules, which are tightly bound together. Each of them is responsible for a certain task and should not do anything else. The modules are only capable of communicating to each other, but not to the `outside'. Only the interface and the file handler may connect with the front-end or the file system respectively.
+	\subsubsection{Interface}
+	The interface is responsible for a fast and reliable communication with the operating system and the front-end. In essence, all it has to do is accept orders from the outside, validate them and pass them on to the corresponding component in the backend. If the command expects a result, the interface will return it.
+	\subsubsection{Settings}
+	The settings store variables which are used in computation. It can be roughly divided in two parts, the mathematical and informational half. The former is concerned with parameters concerning the fractal, i. e. the expected width and height, the viewport and other parameters (for example the \(C\) in the Julia-Set), while the latter stores information which are necessary to know for optimizations, like the thread count of the processor, the available RAM and disk space and more technical details. Although the name settings suggests that these are variable, some may be constant through the program's life cycle and must not be altered in any way, like the CPU's name.
+	\subsubsection{Fractal Calculator}
+	Upon receiving the command from the interface, the fractal calculator starts to calculate a set of points according to the parameters fetched from the settings module. After having created all necessary information to start the rendering process, the calculation's result is given either to the image render module or to the file handler. The fractal calculator is the core part of my thesis paper and I will spend most of my time tinkering with and finding optimizations for it.
+	\subsubsection{Image Render Module}
+	Having calculated the appearance of a fractal is not the same as showing it on the display. The image render module is capable of turning an array of points into an image. While this is rather simple with 2D fractals, it becomes and more of challenge for 3D fractals or even multidimensional fractals. Anybody who has already had some experience in 3D rendering knows that there is more to it than just shapes. Lighting and sampling are a game changer in this regard and make an image more pleasing to look at.\\
+	After rendering the image, it is sent to the interface or to the file handler to save a copy to the local disk.
+	\subsubsection{File Handler}
+	This module can connect to the local file system and read or write data there. It also compresses or decompresses it to save disks space or to optimize the disk read process. The data written there are either images of fractals, videos zooming into a fractal or raw compressed information of it.
+	\subsection{Frontend}
+	\subsection{Connection between Front- and Backend}
+	
+	\section{Libraries}
+	Used (or planned) libraries:\\
+	ffmpeg for video\\
+	PPM (self coded for debugging)\\
+	stb for PNG (https://github.com/nothings/stb)\\
+\end{document}
