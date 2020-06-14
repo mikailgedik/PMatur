@@ -18,6 +18,7 @@
 	\pagenumbering{roman}
 	\maketitle
 	\tableofcontents
+	\listoffigures
 	\clearpage
 	\pagenumbering{arabic}
 	\section{Abstract}
@@ -29,7 +30,7 @@
 	As a Linux user, I am heavily outnumbered by Windows and Mac users. Because of this, my software has to run on the other platforms, or else very few people will be able to test or run my program. Due to me beginning the project in Java, this will only become an issue when switching to C++. I will be using the Vulkan API to use video cards, which is also platform independent and shouldn't cause any issues.
 	\subsection{Backend}
 	\subsubsection{Basic Java Single Threaded Mandelbrot Set Calculation}
-	The first goal is to make a simple Java program, which will calculate the Mandelbrot Set and output the result into a file. It is not yet intended to be structurally divided and good as shown in INSERT\_IMAGE\_NAME, but more closely together as there are yet not enough parts to separate the code.\\
+	The first goal is to make a simple Java program, which will calculate the Mandelbrot set and output the result into a file. It is not yet intended to be structurally divided and good as shown in figure \ref{fig:program_structure} (Page \pageref{fig:program_structure}), but more closely together as there are yet not enough parts to separate the code.\\
 	Next up would be the implementation of the settings using a simple database like a list.
 	\subsubsection{Basic Java Single Threaded Mandelbrot Set Calculation}
 	\subsection{Windowed Frontend}
@@ -38,16 +39,18 @@
 	
 	\section{Program Structure}
 	
-%	\begin{tikzpicture}
-%		\begin{umlpackage}[x=0,y=0]{package-name}
-%		\end{umlpackage}
-%	\end{tikzpicture}
+	%\begin{tikzpicture}
+	%	\begin{umlpackage}[x=0,y=0]{package-name}
+	%	\end{umlpackage}
+	%\end{tikzpicture}
 	
 	My program is separated in two halves, the front- and backend. While the latter is autonomous, the former is dependent on the backend, as it must know its interface, which is the connecting bridge between them. The front-end can request or order a command through a command string or an integer, i. e. a character sequence or a number. The backend answer these with a command result, which may also be an image.\\
 	Because the backend is detached from the front-end, I may also develop multiple front-ends for different needs. The front-end in the diagram below shows a possible version of window-oriented front-end, which is relatively modern and user-friendly, but for example useless in a command line environment. Thus I see the need to develop different front-ends.
 	
-	\begin{center}
-		\begin{tikzpicture}
+		\begin{figure}
+			\centering
+			\caption{Program structure}
+			\begin{tikzpicture}
 			%Front/Backend-connection
 			\draw[red, ultra thick, <-] (5,6.5) -- (7,6.5);
 			\node[above, align=center] at (6,6.5) {Command\\String};
@@ -151,8 +154,11 @@
 			
 			\draw[green, ultra thick, dashed, <-] (11.75, 2.25) -- (12.25, 2.25);
 			\node[rotate = 90] at (12.5, 2.25) {Keyboard/Mouse};
-		\end{tikzpicture}
-	\end{center}
+			\end{tikzpicture}
+			
+			\label{fig:program_structure}
+		\end{figure}
+
 	\subsection{Backend}
 	The backend consists of multiple components or modules, which are tightly bound together. Each of them is responsible for a certain task and should not do anything else. The modules are only capable of communicating to each other, but not to the `outside'. Only the interface and the file handler may connect with the front-end or the file system respectively.
 	\subsubsection{Interface}
@@ -168,6 +174,57 @@
 	This module can connect to the local file system and read or write data there. It also compresses or decompresses it to save disks space or to optimize the disk read process. The data written there are either images of fractals, videos zooming into a fractal or raw compressed information of it.
 	\subsection{Frontend}
 	\subsection{Connection between Front- and Backend}
+	
+	\section{Version History}
+	Each major release of the project is briefly documented here. Note that there are different versions. Each title are the first 6 letters and digits of the commit hash. I will also make a list to briefly explain the code and the changes relative to the previous release. Although I will not explain the code line by line, I might refer to some functions, so having the code open while reading might be useful to look up certain things.
+	\subsection{Java Version}
+	This is the Java version written in Java.
+	\subsubsection{Initializer (6bdf295)}
+	This commit existed for the sole purpose of creating the repository and verifying that it actually works.
+	\subsubsection{First Version}
+	Because the very first version was a simple one-file program, I decided against committing it. But for legacy purposes, I will shortly explain what the code did: It simply made an image and calculated the value of each pixel and saved the result in a file. It was all single threaded and made no use of any optimization.
+	\subsubsection{Java 0.0.1 (68b6e0e)}
+	According to the figure \ref{fig:program_structure} (Page \pageref{fig:program_structure}), the components are now separated in different classes and packages. The ''parent'' package is called \verb|ch.mikailgedik.kzn.matur| and contains the following sub-packages, which names should be self-explanatory: \verb|calculator|, \verb|filemanager|, \verb|render|, \verb|settings|. The only outcast is the \verb|MainClass.java| file, which lies directly in the parent package. It combines the classes and has more of a testing character than an actual use. This is due to the lack of an existing interface and frontend.\\
+	When running the program, you may notice that the timings are not as expected. Here is a sample output:
+	\begin{verbatim}
+	Version: Java 0.0.1
+	Time to calculate fractal: 00064 ms
+	Time to calculate image:   01287 ms
+	Saved image to: /home/mikail/Desktop/File.png
+	Time to save image:        00023 ms
+	\end{verbatim}
+	As you can see, generating the actual data took way less time than transforming the data into an image. This is due to the data not being aligned with the pixels of the image. Each pixel of the image represents a point in the Mandelbrot set. However, there is no guarantee that exactly that point has been previously calculated. The program has to search for the next nearest point in the database, which takes an awful lot of time. In the very first version the points which were calculated depended on the image, so only the necessary points were analyzed.
+	\begin{figure}[h!]
+		\centering
+		\begin{tikzpicture}
+			\draw[step=1.0,black,thin] (0 ,0) grid (5,5);
+		\end{tikzpicture}
+\end{figure}
+	\begin{table}[h!]
+		\centering
+		\label{tab:java_0_0_1}
+		\caption{Changelog for Java 0.0.1}
+		\begin{tabular}{p{.3 \textwidth}|p{.7 \textwidth}}
+			Class name & Class description \\ 
+			\hline 
+			\verb|CalculationResult|&  This class stores the calculated information in an \verb|ArrayList|, which is initialized by the constructor with a given size. I have done this because each time the list has to be resized, all the elements in it have to be copied into a new array. Another feasible approach to solve the resizing problem would have been to use a \verb|LinkedList|, as they can be expanded instantly and use only as much memory as they are big, but their performance suffers greatly when accessed randomly (as opposed to sequentially). \newline
+			The datatype stored in the list is defined as a generic type, and is currently the \verb|CalculationResult.DataMandelbrot| class. Furthermore, the class implements the \verb|Iterable| interface, so that it can be used in \verb|foreach| loops. \\
+			\hline 
+			\verb|CalculationResult.|\linebreak \hspace*{50 pt}\verb|DataMandelbrot|& This class stores one calculated point of the Mandelbrot set. The coordinates are stored as two doubles named \verb|x| and \verb|y|, the actual value is a boolean called \verb|value|, which is true for all points in the set and false for all the others.\\ 
+			\hline 
+			\verb|MandelbrotCalculator|& This class does the actual mathematics regarding the Mandelbrot set. The generation is started by calling the method \verb|calculate|, which then returns an instance of \verb|CalculationResult| with all the calculated points.
+			Apart from that it also holds an instance of the settings, meaning that other components must access this one to get a hold on the settings, like defining the viewport. \\ 
+			\hline
+			\verb|FileManager|& This is the class which interacts with the filesystem. It is currently useless, because it implements a sole method, which saves an image to a file. I have only included this class, so all the code related to saving will not end up in a random class but in a specific one. This way the requirement of madularization is being fulfilled. \\ 
+			\hline
+			\verb|ImageCreator|& The image creator converts raw data to an image. For now, it only has to create an image from the data retrieved from the \verb|MandelbrotCalculator|. The challenge here is that the calculated points' coordinates do not match the exact coordinates of the image. Thus, each pixel has to search for the nearest point in the data set. This is a lengthy process, but I will go into more detail below. \\ 
+			\hline 
+			\verb|SettingsManager|& The \verb|SettingsManager| contains all preset parameters and information required to calculate the fractal. The settings are stored in a \verb|LinkedHashMap| and accessible through the methods provided. The elements of the list must implement the \verb|Setting| interface and its inherited method \verb|identifier()|. There are currently only two settings available, the \verb|SettingViewport| and the \verb|SettingNumber|, which store data for the viewport and data that can be expressed in scalars respectively. \\ 
+			\hline 
+			\verb|TestMain|& As the name suggests, this mainclass is only here to test the components. It replaces a proper frontend, which I have not yet created because of the big amount of work associated with it. \\ 
+		\end{tabular} 
+	\end{table}
+	
 	
 	\section{Libraries}
 	Used (or planned) libraries:\\
