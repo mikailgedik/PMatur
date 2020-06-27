@@ -9,6 +9,7 @@
 \usepackage[left=2.00cm, right=2.00cm, top=2.00cm, bottom=2.00cm]{geometry}
 \usepackage{tikz}
 \usepackage{tikz-uml}
+\usetikzlibrary{patterns}%for tikz https://tex.stackexchange.com/questions/54464/hatch-a-rectangle-in-tikz
 
 %Makes index browsable in pdf viewers and shows index in sidebar
 \usepackage[bookmarks]{hyperref}
@@ -193,13 +194,73 @@
 	Saved image to: /home/mikail/Desktop/File.png
 	Time to save image:        00023 ms
 	\end{verbatim}
-	As you can see, generating the actual data took way less time than transforming the data into an image. This is due to the data not being aligned with the pixels of the image. Each pixel of the image represents a point in the Mandelbrot set. However, there is no guarantee that exactly that point has been previously calculated. The program has to search for the next nearest point in the database, which takes an awful lot of time. In the very first version the points which were calculated depended on the image, so only the necessary points were analyzed.
+	As you can see, generating the actual data took way less time than transforming the data into an image. This is due to the data not being aligned with the pixels of the image. In contrast to the first version, the \verb|MandelbrotCalculator| is not aware of the specifications of the image (i. e. location, size and resolution) and is only informed about the rough area it has to calculate. As a result, the \verb|MandelbrotCalculator| creates a dataset that will only approximately match the pixels of the image, if at all. When the dataset is used by the \verb|ImageCreator|, it has to search the next nearest value for each pixel, leading to tremendous render times. The figure \ref{fig:java_data_in_grid} (Page \pageref{fig:java_data_in_grid}) shows this behavior visually.\\
+	The reasoning behind this is quite simple: On one hand, the data set does not have to match the image created in the end. This makes it easy to create cropped images, images with a lower resolution (if needed) and the like. On the other hand, multidimensional fractals cannot be stored in 2D-image arrays. Although I have yet only created 2D images, I want to create a future-proof way of saving the data. Another advantage is removing the redundancy: As clearly seen in any plain example image, there are a lot of recurring patterns. In the Mandelbrot set (or any fractal for that matter), I am primarily interested in what is in and what is not in the fractal. So instead of saving each point, it would be much easier to save only the dividing line between the two areas. Thus, using an image to save the data set ceases to be an option, and I have to use my own way to save the data. This comes with the cost of of losing the ability to compress the data, because the algorithms for these run only on images, and not on custom defined data sets. Lastly, I want to address the issue with the time: I am aware of the fact that it is not acceptable that the rendering takes more time than calculating. I will try to tackle this issue in a further version.
 	\begin{figure}[h!]
 		\centering
-		\begin{tikzpicture}
-			\draw[step=1.0,black,thin] (0 ,0) grid (5,5);
+		\caption{Comparison between the two models}
+		\label{fig:java_data_in_grid}
+		\begin{tikzpicture}[xscale=-1]
+			\draw[pattern=north west lines, pattern color=green] (5, 0) rectangle (6,1);
+			\draw[pattern=north west lines, pattern color=yellow] (6, 0) rectangle (7,1);
+			\draw[pattern=north west lines, pattern color=cyan] (5, 1) rectangle (6,2);
+			\draw[pattern=north west lines, pattern color=red] (6, 1) rectangle (7,2);
+			
+			\draw[step=1.0,black] (0, 0) grid (2,2);
+			
+			\foreach \x in {0.5,..., 1.5} {
+				\foreach \y in {0,..., 1} {
+					\draw[-] (\x, {\y + 0.33 * (\x + 0.5)}) -- (\x + 2.5, {\y + 0.33 * (\x + 0.5)});
+				}
+			}
+			
+			\draw [->, color=green]  (3, .33) -- (5.5, .33);
+			\draw [->, color=yellow] (3.5, .66) -- (6.5, .66);
+			\draw [->, color=cyan]   (3, 1.33) -- (5.5, 1.33);
+			\draw [->, color=red]    (3.5, 1.66) -- (6.5, 1.66);
+			
+			\node[align=center] at (3.5 ,2.5) {Each pixel\\ calculates a value};
+			
+			\draw[step=1,black] (5, 0) grid (7, 2);
+			
+			\draw[dashed] (-1,-.5) -- (8, -.5);
+			\draw[dashed] (-1,3) -- (8, 3);
+		\end{tikzpicture} \\
+		\begin{tikzpicture}[scale=-1]
+		%first fill circles with gray, then draw border later
+		\foreach \x in {
+			{0.1, 1.44},{1.47, 0.95},{0.61, 0.59},{1.66, 1.7},{0.71, 1.06},{0.79, 0.86},{1.27, 1.14},{0.06, .2},{1.99, 1.77},{1.5, 0.07}} {
+			\fill[gray] (\x) circle[radius=.1];
+		}
+	
+		\fill[color=green] (0.06, .2)  circle[radius=.1];
+		\fill[color=yellow] (1.5, 0.07) circle[radius=.1];
+		\fill[color=cyan] (0.1, 1.44) circle[radius=.1];
+		\fill[color=red] (1.66, 1.7) circle[radius=.1];
+		
+		\draw[pattern=north west lines, pattern color=green] (5, 0) rectangle (6,1);
+		\draw[pattern=north west lines, pattern color=yellow] (6, 0) rectangle (7,1);
+		\draw[pattern=north west lines, pattern color=cyan] (5, 1) rectangle (6,2);
+		\draw[pattern=north west lines, pattern color=red] (6, 1) rectangle (7,2);
+		
+		%draw borders of circles after color has been drawn
+		\foreach \x in {
+			{0.1, 1.44},{1.47, 0.95},{0.61, 0.59},{1.66, 1.7},{0.71, 1.06},{0.79, 0.86},{1.27, 1.14},{0.06, .2},{1.99, 1.77},{1.5, 0.07}} {
+			\draw (\x) circle[radius=.1];
+		}
+		
+	
+		\draw [->] (0.06, .2) -- (5.5, .5);
+		\draw [->] (1.5, 0.07) -- (6.5, .5);
+		\draw [->] (0.1, 1.44) -- (5.5, 1.5);
+		\draw [->] (1.66, 1.7) -- (6.5, 1.5);
+		
+		\node[align=center] at (3.5 ,2.4) {Each pixel\\has to search for the nearest\\calculated value};
+		
+		\draw[step=1,black] (5, 0) grid (7, 2);
 		\end{tikzpicture}
-\end{figure}
+	\end{figure}
+
 	\begin{table}[h!]
 		\centering
 		\label{tab:java_0_0_1}
