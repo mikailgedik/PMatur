@@ -177,7 +177,7 @@
 	\subsection{Connection between Front- and Backend}
 	
 	\section{Version History}
-	Each major release of the project is briefly documented here. Note that there are different versions. Each title are the first 6 letters and digits of the commit hash. I will also make a list to briefly explain the code and the changes relative to the previous release. Although I will not explain the code line by line, I might refer to some functions, so having the code open while reading might be useful to look up certain things.
+	Each major release of the project is briefly documented here. Note that there are different versions. Each title are the first seven letters and digits of the commit hash. I will also make a list to briefly explain the code and the changes relative to the previous release. Although I will not explain the code line by line, I might refer to some functions, so having the code open while reading might be useful to look up certain things.
 	\subsection{Java Version}
 	This is the Java version written in Java.
 	\subsubsection{Initializer (6bdf295)}
@@ -276,7 +276,7 @@
 			\verb|MandelbrotCalculator|& This class does the actual mathematics regarding the Mandelbrot set. The generation is started by calling the method \verb|calculate|, which then returns an instance of \verb|CalculationResult| with all the calculated points.
 			Apart from that it also holds an instance of the settings, meaning that other components must access this one to get a hold on the settings, like defining the viewport. \\ 
 			\hline
-			\verb|FileManager|& This is the class which interacts with the filesystem. It is currently useless, because it implements a sole method, which saves an image to a file. I have only included this class, so all the code related to saving will not end up in a random class but in a specific one. This way the requirement of madularization is being fulfilled. \\ 
+			\verb|FileManager|& This is the class which interacts with the filesystem. It is currently useless, because it implements a sole method, which saves an image to a file. I have only included this class, so all the code related to saving will not end up in a random class but in a specific one. This way the requirement of modularization is being fulfilled. \\ 
 			\hline
 			\verb|ImageCreator|& The image creator converts raw data to an image. For now, it only has to create an image from the data retrieved from the \verb|MandelbrotCalculator|. The challenge here is that the calculated points' coordinates do not match the exact coordinates of the image. Thus, each pixel has to search for the nearest point in the data set. This is a lengthy process, but I will go into more detail below. \\ 
 			\hline 
@@ -285,8 +285,12 @@
 			\verb|TestMain|& As the name suggests, this mainclass is only here to test the components. It replaces a proper frontend, which I have not yet created because of the big amount of work associated with it. \\ 
 		\end{tabular} 
 	\end{table}
-	
-	
+
+	\subsubsection{Java 0.0.2 (892e1e0)}
+	This version updates the \verb|SettingsManager| to use a \verb|TreeMap| with strings as keys and objects as values. Previously, all the settings were sorted by their type in different classes (e.g. \verb|SettingViewport|). As of now, the settings are stored ordered (for performance reasons) in a \verb|TreeMap|. The main advantage is that adding a new setting is now not as cumbersome as it was before, because it suffices to add a new entry by calling the \verb|SettingsManager.addSetting(String name, Object value)| instead of having to create a new class for it or add an additional field. The drawbacks are longer retrieving times, as the whole map has to be searched for every value rather than retrieving one class and getting the value of one of its fields. Aside from this, the default settings are not hardcoded anymore but stored in a file named \verb|resources/settings/defaultsettings|. The \verb|resources| directory contains all files related to resources, i. e. data required for the program (in contrast to executable code).\\
+	In order to address the values without to type out the whole key, constants exists in the \verb|SettingsManager|. Their names should be self-explanatory. Values are retrieved by calling the \verb|SettingsManager.get(String name)| method. However, because the datatype of the setting is often already known, I have also implemented a few methods which automatically convert the value to a given type (\verb|getI|, \verb|getD| and \verb|getS| for integers, doubles and strings respectively). These methods throw an exception the setting requested does not exist.\\
+	Aside from the these changes, I made minor adjustments in the \verb|FileManager| class. All other classes have only be changed to accustom the new \verb|SettingsManager| class
+
 	\section{Libraries}
 	Used (or planned) libraries:\\
 	ffmpeg for video\\
