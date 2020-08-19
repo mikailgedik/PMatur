@@ -37,7 +37,6 @@
 	\subsection{Windowed Frontend}
 	\subsection{Other Known Programs}
 	
-	
 	\section{Program Structure}
 	
 	%\begin{tikzpicture}
@@ -177,15 +176,9 @@
 	\subsection{Connection between Front- and Backend}
 	
 	\section{Version History}
-	Each major release of the project is briefly documented here. Note that there are different versions. Each title are the first seven letters and digits of the commit hash. I will also make a list to briefly explain the code and the changes relative to the previous release. Although I will not explain the code line by line, I might refer to some functions, so having the code open while reading might be useful to look up certain things.
+	In this section we will take a look at the creation history of my program and discuss its most important aspects. Because not every version brings noteworthy changes with themselves, I have chosen split the log in two parts; All the important changes will be noted here, the lesser relevant are in the appendix \ref{appendix:version_history} (page \pageref{appendix:version_history}).
 	\subsection{Java Version}
-	This is the Java version written in Java.
-	\subsubsection{Initializer (6bdf295)}
-	This commit existed for the sole purpose of creating the repository and verifying that it actually works.
-	\subsubsection{First Version}
-	Because the very first version was a simple one-file program, I decided against committing it. But for legacy purposes, I will shortly explain what the code did: It simply made an image and calculated the value of each pixel and saved the result in a file. It was all single threaded and made no use of any optimization.
 	\subsubsection{Java 0.0.1 (68b6e0e)}
-	According to the figure \ref{fig:program_structure} (Page \pageref{fig:program_structure}), the components are now separated in different classes and packages. The ''parent'' package is called \verb|ch.mikailgedik.kzn.matur| and contains the following sub-packages, which names should be self-explanatory: \verb|calculator|, \verb|filemanager|, \verb|render|, \verb|settings|. The only outcast is the \verb|MainClass.java| file, which lies directly in the parent package. It combines the classes and has more of a testing character than an actual use. This is due to the lack of an existing interface and frontend.\\
 	When running the program, you may notice that the timings are not as expected. Here is a sample output:
 	\begin{verbatim}
 	Version: Java 0.0.1
@@ -201,30 +194,30 @@
 		\caption{Comparison between the two models}
 		\label{fig:java_data_in_grid}
 		\begin{tikzpicture}[xscale=-1]
-			\draw[pattern=north west lines, pattern color=green] (5, 0) rectangle (6,1);
-			\draw[pattern=north west lines, pattern color=yellow] (6, 0) rectangle (7,1);
-			\draw[pattern=north west lines, pattern color=cyan] (5, 1) rectangle (6,2);
-			\draw[pattern=north west lines, pattern color=red] (6, 1) rectangle (7,2);
-			
-			\draw[step=1.0,black] (0, 0) grid (2,2);
-			
-			\foreach \x in {0.5,..., 1.5} {
-				\foreach \y in {0,..., 1} {
-					\draw[-] (\x, {\y + 0.33 * (\x + 0.5)}) -- (\x + 2.5, {\y + 0.33 * (\x + 0.5)});
-				}
+		\draw[pattern=north west lines, pattern color=green] (5, 0) rectangle (6,1);
+		\draw[pattern=north west lines, pattern color=yellow] (6, 0) rectangle (7,1);
+		\draw[pattern=north west lines, pattern color=cyan] (5, 1) rectangle (6,2);
+		\draw[pattern=north west lines, pattern color=red] (6, 1) rectangle (7,2);
+		
+		\draw[step=1.0,black] (0, 0) grid (2,2);
+		
+		\foreach \x in {0.5,..., 1.5} {
+			\foreach \y in {0,..., 1} {
+				\draw[-] (\x, {\y + 0.33 * (\x + 0.5)}) -- (\x + 2.5, {\y + 0.33 * (\x + 0.5)});
 			}
-			
-			\draw [->, color=green]  (3, .33) -- (5.5, .33);
-			\draw [->, color=yellow] (3.5, .66) -- (6.5, .66);
-			\draw [->, color=cyan]   (3, 1.33) -- (5.5, 1.33);
-			\draw [->, color=red]    (3.5, 1.66) -- (6.5, 1.66);
-			
-			\node[align=center] at (3.5 ,2.5) {Each pixel\\ calculates a value};
-			
-			\draw[step=1,black] (5, 0) grid (7, 2);
-			
-			\draw[dashed] (-1,-.5) -- (8, -.5);
-			\draw[dashed] (-1,3) -- (8, 3);
+		}
+		
+		\draw [->, color=green]  (3, .33) -- (5.5, .33);
+		\draw [->, color=yellow] (3.5, .66) -- (6.5, .66);
+		\draw [->, color=cyan]   (3, 1.33) -- (5.5, 1.33);
+		\draw [->, color=red]    (3.5, 1.66) -- (6.5, 1.66);
+		
+		\node[align=center] at (3.5 ,2.5) {Each pixel\\ calculates a value};
+		
+		\draw[step=1,black] (5, 0) grid (7, 2);
+		
+		\draw[dashed] (-1,-.5) -- (8, -.5);
+		\draw[dashed] (-1,3) -- (8, 3);
 		\end{tikzpicture} \\
 		\begin{tikzpicture}[scale=-1]
 		%first fill circles with gray, then draw border later
@@ -232,7 +225,7 @@
 			{0.1, 1.44},{1.47, 0.95},{0.61, 0.59},{1.66, 1.7},{0.71, 1.06},{0.79, 0.86},{1.27, 1.14},{0.06, .2},{1.99, 1.77},{1.5, 0.07}} {
 			\fill[gray] (\x) circle[radius=.1];
 		}
-	
+		
 		\fill[color=green] (0.06, .2)  circle[radius=.1];
 		\fill[color=yellow] (1.5, 0.07) circle[radius=.1];
 		\fill[color=cyan] (0.1, 1.44) circle[radius=.1];
@@ -249,7 +242,7 @@
 			\draw (\x) circle[radius=.1];
 		}
 		
-	
+		
 		\draw [->] (0.06, .2) -- (5.5, .5);
 		\draw [->] (1.5, 0.07) -- (6.5, .5);
 		\draw [->] (0.1, 1.44) -- (5.5, 1.5);
@@ -260,7 +253,85 @@
 		\draw[step=1,black] (5, 0) grid (7, 2);
 		\end{tikzpicture}
 	\end{figure}
-
+	\subsubsection{Java Version 0.0.3 (fcaf89f) - First UI}
+	A simple UI has been added. The UI consists of the rendered image and log in the center, a refresh button in the south and a menu bar. Currently, only the \verb|save|, \verb|close| and \verb|Open settings| menuitems are working. Saving brings up a dialog where one can choose where to export the image (currently, only \verb|png| is supported). When opening the settings, a dialog with all the changeable options comes up. Upon changing, make sure to hit the \verb|Save and exit| button. The program is smart enough to only update the entries that were changed.\\
+	The main aspect is the image in the center. When using the mouse wheel on it, one can zoom in and out of the set. With drag and drop, one can move around in the image. However, because on each iteration the program has to recalculate the image, it may take a long time to just move on pixel to the side.
+	
+	
+	\section{Key Functionalities}
+	In this section I will explain the key functionalities of my program schematically, i. e. how the algorithms work. Naturally, there are often multiple approaches on how to solve a problem, resulting in having different solutions for the same problem. However, they are not equal in execution time and resource management, thus bringing diverse advantages (and disadvantages) in different situations.
+	\subsection{Image Structure}
+	After the image has been generated from the data, it is stored in a bitmap (i. e. in a raster). The underlying implementation uses a one-dimensional array. Before generation, the viewport has to be specified. It defines the area which has to be rendered.\\
+	Notice that the width and height are defined twice. Once for the image, and once for the viewport. These two values are not to be confused. The dimensions of the image describe the amount of pixels, and therefore the resolution. Changing these values will not move you around in the fractal or change your view, but you will see the image with more precision and it will appear less blurred.\\
+	The dimensions of the viewport describe the sector of the fractal which is rendered. The viewport also contains a start point, which the image dimension lacks. Moving around the point will move the area up and down or rather left and right. Changing the width and height will zoom in and out of the image and stretch it.\\
+	One big problem here is the aspect ratio. Assume that the viewport specifies a width of 10 and a height of 5, but the image is 100 pixels tall and wide. The aspect ratios are 2:1 and 1:1 respectively. The result will be a squashed/stretched image as seen in figure \ref{fig:aspect_ratio} (Page \pageref{fig:aspect_ratio}).
+		\begin{figure}[h!]
+		\centering
+		\caption{Image versus Viewport}
+		\label{fig:image_viewport}
+		\begin{tikzpicture}
+		\draw[step=.5,black] (0, 0) grid (4,3);
+		
+		\draw[|-|] (0, -.2) -- (2,  -.2) node[below] {Image width} -- (4, -.2);
+		\draw[|-|] (0, 3.2) -- (2,  3.2) node[above] {Viewport width} -- (4, 3.2);
+		
+		\draw[|-|] (-.2, 0) -- (-.2, 1.5) node[left] {Image heigth} -- (-.2, 3);
+		\draw[|-|] (4.2, 0) -- (4.2, 1.5) node[right] {Viewport heigth} -- (4.2, 3);
+		
+		\fill (0,0) circle[radius=.075] node [below left, align=left] {Viewport\\Start (x,y)};
+		\end{tikzpicture}
+	\end{figure}
+	\begin{figure}[h!]
+		\centering
+		\caption{Aspect Ratio Problem Visualized}
+		\label{fig:aspect_ratio}
+		\begin{tikzpicture}
+		\node at(2.5,1.25) {\includegraphics[width=5cm,height=2.5cm]{./res/images/stretch_1.png}};
+		\node at(8.5,2.5) {\includegraphics[width=5cm,height=5cm]{./res/images/stretch_2.png}};
+		
+		\node[below] at (2.5, 0) {Viewport};
+		\node[below] at (8.5, 0) {Image};
+		
+		\draw[step=.5, red] (0, 0) grid (5,2.5);
+		\draw[step=.5, red] (5.9999, 0) grid (11,5);
+		
+		\end{tikzpicture}
+	\end{figure}
+	\subsection{Data}
+	Data calculated can be stored in many ways, from simple arrays to complex databanks. I have taken different approaches on how the data is stored
+	\subsubsection{Directly in Image}
+	The data is stored directly in the image, i. e. each pixel represents a coordinate and is given a color representing its value (currently white if it is in the set, pink otherwise). The big advantage is that the calculation can be directly shown on screen; i. e. there is no conversion between from data to the image, giving a good performance. Disadvantages are that it is not flexible. Assume that one wants to move around or zoom into the image. A new image has to be created, and if the old and new viewport overlap, some data might be recyclable. If a third image has to be produced, the program has to look at two different images to calculate the new image instead of one dataset.
+	\subsubsection{Simple List}
+	The data is stored in an list, each value consist of a pair of coordinates and a value. To create an image, we assign each pixel a coordinate and iterate over the list to get the value at that location of the set. The disadvantage is the aforementioned fact: to find the value of a pixel, the whole list has to be searched. This is a very time-costly operation and leads to the absurd fact that it takes less time to create the list than the image.
+	\subsubsection{Multiple Sorted List}
+	Instead of shoving all the data in one big list, the data is split according to their position in smaller lists (so called clusters in my program). These clusters only save data from a specific area, and when searching for the value of a specific coordinate the program only has to search in one cluster instead of all the values.
+	\begin{figure}[h!]
+		\centering
+		\caption{}
+		\label{fig:cluster}
+		\begin{tikzpicture}
+			\draw[step=1.0,black] (0, 0) grid (2,2);
+			
+			\draw[|-|] (0, 2.2) -- (1, 2.2) node[above] {width}-- (2, 2.2);
+			\draw[|-|] (2.2, 0) -- (2.2, 1) node[right] {height}-- (2.2, 2);
+		\end{tikzpicture}
+	\end{figure}
+	\section{Libraries}
+	Used (or planned) libraries:\\
+	ffmpeg for video\\
+	PPM (self coded for debugging)\\
+	stb for PNG (https://github.com/nothings/stb)\\
+	
+	\appendix
+	\section{Complete Version History}\label{appendix:version_history}
+	\subsection{Java Version}
+	This is the Java version written in Java.
+	\subsubsection{Initializer (6bdf295)}
+	This commit existed for the sole purpose of creating the repository and verifying that it actually works.
+	\subsubsection{First Version}
+	Because the very first version was a simple one-file program, I decided against committing it. But for legacy purposes, I will shortly explain what the code did: It simply made an image and calculated the value of each pixel and saved the result in a file. It was all single threaded and made no use of any optimization.
+	\subsubsection{Java 0.0.1 (68b6e0e)}
+	According to the figure \ref{fig:program_structure} (Page \pageref{fig:program_structure}), the components are now separated in different classes and packages. The ''parent'' package is called \verb|ch.mikailgedik.kzn.matur| and contains the following sub-packages, which names should be self-explanatory: \verb|calculator|, \verb|filemanager|, \verb|render|, \verb|settings|. The only outcast is the \verb|MainClass.java| file, which lies directly in the parent package. It combines the classes and has more of a testing character than an actual use. This is due to the lack of an existing interface and frontend.\\
 	\begin{table}[h!]
 		\centering
 		\label{tab:java_0_0_1}
@@ -285,15 +356,9 @@
 			\verb|TestMain|& As the name suggests, this mainclass is only here to test the components. It replaces a proper frontend, which I have not yet created because of the big amount of work associated with it. \\ 
 		\end{tabular} 
 	\end{table}
-
+	
 	\subsubsection{Java 0.0.2 (892e1e0)}
 	This version updates the \verb|SettingsManager| to use a \verb|TreeMap| with strings as keys and objects as values. Previously, all the settings were sorted by their type in different classes (e.g. \verb|SettingViewport|). As of now, the settings are stored ordered (for performance reasons) in a \verb|TreeMap|. The main advantage is that adding a new setting is now not as cumbersome as it was before, because it suffices to add a new entry by calling the \verb|SettingsManager.addSetting(String name, Object value)| instead of having to create a new class for it or add an additional field. The drawbacks are longer retrieving times, as the whole map has to be searched for every value rather than retrieving one class and getting the value of one of its fields. Aside from this, the default settings are not hardcoded anymore but stored in a file named \verb|resources/settings/defaultsettings|. The \verb|resources| directory contains all files related to resources, i. e. data required for the program (in contrast to executable code).\\
 	In order to address the values without to type out the whole key, constants exists in the \verb|SettingsManager|. Their names should be self-explanatory. Values are retrieved by calling the \verb|SettingsManager.get(String name)| method. However, because the datatype of the setting is often already known, I have also implemented a few methods which automatically convert the value to a given type (\verb|getI|, \verb|getD| and \verb|getS| for integers, doubles and strings respectively). These methods throw an exception the setting requested does not exist.\\
 	Aside from the these changes, I made minor adjustments in the \verb|FileManager| class. All other classes have only be changed to accustom the new \verb|SettingsManager| class
-
-	\section{Libraries}
-	Used (or planned) libraries:\\
-	ffmpeg for video\\
-	PPM (self coded for debugging)\\
-	stb for PNG (https://github.com/nothings/stb)\\
 \end{document}
