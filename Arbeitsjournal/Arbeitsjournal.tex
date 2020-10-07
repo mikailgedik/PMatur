@@ -25,4 +25,16 @@
 	Added java modules for back and frontend. Simple multithreading. Start of summer break
 	\section{2020-08-17}
 	Added changed way data is stored in backend. End of summer break
+	
+	\section{2020-05-31 to 2020-07-05}
+	Focus was on basic implementation.
+	
+	The current goal is to render a simple Mandelbrot set into an image file. The next step was the modularization and mutlithreading, which were both achieved around (2020-07-12). Next up was a basic interactive windowed frontend, as before the only way to interact with the program was the command line. Using the java swing API, I created a simple window, where the image was rendered. It could be moved around with the mouse and zoomed in. Although the image was resized on zooming in, it was not recalculated, resulting in looking very coarse. However, solving this problem required a new underlying way the calculated data was stored. Motivated by this I started to develop different algorithms and data structures to store the data, each with different approaches to a solution, as well as different trade offs (2020-08-07).\\
+	Due to these changes I have been able to buffer the image creation in such a way that the whole image does not have to be recalculated and can be based on the previous in case of zooming in or moving around.\\
+	Lastly, the color function was changed to display the number of iterations a value of the set had to do to be excluded of the Mandelbrot set.
+	\section{29-09-2020}
+	The application can now zoom in into the image infinitely. However, even though no new values are created, RAM is reserved for not yet calculated values. Because the RAM usage rises exponentially, all available RAM is quickly consumed, leading to a systemwide slowdown of all open applications, as SWAP will be used.
+	When a new image with a higher quality is requested, only the new values of the required layer are calculated. 
+	\section{05-10-2020}
+	A small section was added to the mandelbrot set
 \end{document}

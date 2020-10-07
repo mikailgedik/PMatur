@@ -4,6 +4,11 @@
 *.out
 *.gz
 *.aux
+*.bbl
+*.bcf
+*.blg
+*.run.xml
 2015_Book_FractalGeometryAndStochasticsV.pdf
 tikzumlmanual.pdf
 rtqjs.pdf
+uml-diagrams-with-tikz-uml.pdf

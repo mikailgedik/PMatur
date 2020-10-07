@@ -10,7 +10,9 @@
 \usepackage{tikz}
 \usepackage{tikz-uml}
 \usetikzlibrary{patterns}%for tikz https://tex.stackexchange.com/questions/54464/hatch-a-rectangle-in-tikz
-
+%sources
+\usepackage[backend=bibtex]{biblatex}
+\bibliography{Thesis}
 %Makes index browsable in pdf viewers and shows index in sidebar
 \usepackage[bookmarks]{hyperref}
 \author{Mikail Gedik}
@@ -24,7 +26,62 @@
 	\pagenumbering{arabic}
 	\section{Abstract}
 	This paper tackles the calculation of a few selected fractals and shines light on the core aspects I have implemented and furthermore optimized to use all the resources provided by the computer. My journey begins at a single threaded Java program and ends in a multi threaded C application able to make use graphics cards. Additionally, I will make an easy-to use yet powerful UI, which will enable even tech-unfamiliar people to use my software.
-	\subsection{Program Capabilities \& Expectations}
+	
+	
+	\section{What is a Fractal}
+	Fractals are complex geometric shapes with special properties. But in contrast to normal finite Euclidean shapes (such as the circle, sphere, cube etc.), fractals are infinite. The angles and the lines of a cube are indifferent from the magnification. Fractals have the property that no matter how much they are magnified or zoomed into, the edges are never smooth but rough. New levels of detail will appear. Surprisingly, some fractals can even contain themselves. This property (well seen in the Sierpinski triangle, figure \ref{fig:sierpinski_triangle}) is called self-similarity. Although the self-similarity in this example is perfect, many fractals contain non-perfect copies of themselves. This can often be observed in nature, for example tree branches or snowflakes (figure \ref{fig:snowflake}).\\
+	There are different types of fractals: geometric, algebraic and naturally occurring. Geometric and algebraic fractals are created by repeating a process over and over again. The Sierpinski triangle repeatedly cuts out the center piece of each black triangle \ref{fig:sierpinski_triangle_build}. The algebraic ones iterate have to iterate over an equation to determine its shape.\\
+	While they were first conceptualized by Felix Hausdorff in 1918, the term fractal (from Latin fragmented, broken) was only coined in 1975 by mathematician Benoit B. Mandelbrot. A factor in this long time span were the invention of computers, which made the exploration of fractals much easier due to their impressive computation power. Mandelbrot used fractals as a tool to examine the stock market, but were also found to be useful in various fields like physical chemistry, fluid mechanics and physiology. \cite{FractalFoundation}, \cite{FractalFoundation}, \cite{britannica}.
+	\begin{figure}[h]
+		\caption{Sierpi?ski triangle [\cite{Sierpinski}]}
+		\label{fig:sierpinski_triangle}
+		\centering
+		\includegraphics[width=0.5\textwidth]{"res/images/1000px-Sierpinski_triangle.svg.png"}
+	\end{figure}
+	\begin{figure}[h]
+		\caption{Each branch of the snowflake creates new smaller branches \cite{wikipedia_snowflake}}
+		\label{fig:snowflake}
+		\centering
+		\includegraphics[width=0.5\textwidth]{"res/images/bentley_snowflake.jpg"}
+	\end{figure}
+	\begin{figure}[h]
+		\caption{Creation of the Sierpinski triangle}
+		\label{fig:sierpinski_triangle_build}
+		\centering
+		\begin{tikzpicture}[scale=3]
+			\fill[black] (0,0) -- (1.118,0) -- (1.118/2, 1);
+			
+			\draw[rounded corners, dashed, red, ultra thick] (1.118/2, 0) -- (1.118/4*3,.5) -- (1.118/4, .5) -- (1.118/2, 0);
+		\end{tikzpicture}
+		\begin{tikzpicture}[scale=3]
+			\fill[black] (0,0) -- (1.118033989,0) -- (1.118033989/2, 1);
+			\fill[white] (1.118/2, 0) -- (1.118/4*3,.5) -- (1.118/4, .5);
+			
+			\draw[rounded corners, dashed, red, ultra thick] (1.118/4*3, 0) -- (1.118/8*5,.25) -- (1.118/8*7, .25) -- (1.118/4*3, 0);
+			\draw[rounded corners, dashed, red, ultra thick] (1.118/4, 0) -- (1.118/8,.25) -- (1.118/8*3, .25) -- (1.118/4, 0);
+			\draw[rounded corners, dashed, red, ultra thick] (1.118/2, .5) -- (1.118/8*3,.75) -- (1.118/8*5, .75) -- (1.118/2, .5);
+		\end{tikzpicture}
+		\begin{tikzpicture}[scale=3]
+			\fill[black] (0,0) -- (1.118033989,0) -- (1.118033989/2, 1);
+			
+			\fill[white] (1.118/2, 0) -- (1.118/4*3,.5) -- (1.118/4, .5);
+			
+			\fill[white] (1.118/4*3, 0) -- (1.118/8*5,.25) -- (1.118/8*7, .25);
+			\fill[white] (1.118/4, 0) -- (1.118/8,.25) -- (1.118/8*3, .25);
+			\fill[white] (1.118/2, .5) -- (1.118/8*3,.75) -- (1.118/8*5, .75);
+		\end{tikzpicture}
+	\end{figure}
+	
+	%finite fractal contains infinity/self-similarity. occurs in nature. equally rough at all scales. not possible to understand with classical geometry\cite{FractalsForDummies}.\\
+	%Never ending repeating branching pattern. (Infinitely complex). Made by repeating simple process often. Geometric fractals created by repeating simple process (sierpinski triangle). Algebraic fractals: repeat equation over and over \cite{FractalFoundation}:\\
+	%complex geometric shapes. Concept by Felix Hausdorff 1918. Are distinct from classical/Euclidean geometry (square, circle, sphere etc.). spatially nonuniform phenomena in nature (coastlines, mountain ranges). Word fractal (Latin for "fragmented", "broken") by mathematician Benoit B. Mandelbrot. Fractals as tools for different fields (stock market). Self-similar objects have remain invariant under changes of scale: they have scaling symmetry. Fractal dimension vs. euclidean dimension, a noninteger. Fractals are used to simulate nature (e. g. tree branches)\cite{britannica}
+	
+	\section{The Mandelbrot Set}
+	Although the most part of my thesis paper is dedicated to computer science the necessity arises to explain the most used fractal in my work. The Mandelbrot set was named after Benoit Mandelbrot, and is the first one to be called a fractal. In terms of properties, it is related to the Julia set, which is not a part of my work, albeit my program has the ability to display them. The Mandelbrot set is an algebraic fractal in the complex plane \(z = a + b i\). To find out which points are part of the set, we have to repeatedly apply the function \(z_{n+1} = z_{n}^2 + c\) to every point \(z\) in the plane. If the point diverges (or is known to diverge) as \(n\) approaches infinity, it is said to be outside the set. The most interesting points lie at the boundary of the set, as the edge is the most interesting part of any fractal.
+	
+	%named after benoit mandelbrot. related to julia set. choose complex number \(c\) and \(z_0\) and repeatedly put into equation \(z_n = z_{n+1} + c\). If \(z_n\) diverges, point not in fractal. Interesting points near boundary \cite{freeuk}
+	
+	\section{Program Capabilities \& Expectations}
 	Here I will be listing all capabilities my program should have, from easiest to hardest.
 	\subsection{General}
 	\subsubsection{Operating System Independence}
@@ -173,7 +230,9 @@
 	\subsubsection{File Handler}
 	This module can connect to the local file system and read or write data there. It also compresses or decompresses it to save disks space or to optimize the disk read process. The data written there are either images of fractals, videos zooming into a fractal or raw compressed information of it.
 	\subsection{Frontend}
+	The frontend is the mediator between the backend and the user. It makes the program's capabilities, which are invoked through methods and functions, available to humans, which can only (without considering voice commands or touch screens) interfere with the computer by mouse and keyboard. The frontend takes commands, which are issued by mouse clicks or keyboard strokes, and forwards them to the backend. These commands usually yield a result, which is reported back to the frontend and shown to the user. For all this, a window is needed.
 	\subsection{Connection between Front- and Backend}
+	As any API, the backend provides a way to interact with it. The connecting piece is called \verb|Connector| in the java version. Because of the modularization, the frontend's access is restricted to only this class. While that may sound cumbersome, it brings the advantage that I can perform fundamental changes (as long as the connector is not changed) to the backend without changing anything in the frontend.
 	
 	\section{Version History}
 	In this section we will take a look at the creation history of my program and discuss its most important aspects. Because not every version brings noteworthy changes with themselves, I have chosen split the log in two parts; All the important changes will be noted here, the lesser relevant are in the appendix \ref{appendix:version_history} (page \pageref{appendix:version_history}).
@@ -302,20 +361,55 @@
 	\subsubsection{Directly in Image}
 	The data is stored directly in the image, i. e. each pixel represents a coordinate and is given a color representing its value (currently white if it is in the set, pink otherwise). The big advantage is that the calculation can be directly shown on screen; i. e. there is no conversion between from data to the image, giving a good performance. Disadvantages are that it is not flexible. Assume that one wants to move around or zoom into the image. A new image has to be created, and if the old and new viewport overlap, some data might be recyclable. If a third image has to be produced, the program has to look at two different images to calculate the new image instead of one dataset.
 	\subsubsection{Simple List}
-	The data is stored in an list, each value consist of a pair of coordinates and a value. To create an image, we assign each pixel a coordinate and iterate over the list to get the value at that location of the set. The disadvantage is the aforementioned fact: to find the value of a pixel, the whole list has to be searched. This is a very time-costly operation and leads to the absurd fact that it takes less time to create the list than the image.
-	\subsubsection{Multiple Sorted List}
-	Instead of shoving all the data in one big list, the data is split according to their position in smaller lists (so called clusters in my program). These clusters only save data from a specific area, and when searching for the value of a specific coordinate the program only has to search in one cluster instead of all the values.
+	The data is stored in an list, each value consist of a pair of coordinates and a value. To create an image, we assign each pixel a coordinate and iterate over the list to get the value at that location of the set. The disadvantage is the aforementioned fact: to find the value of a pixel, the whole list has to be searched. This is a very time-costly operation and leads to the absurd fact that it takes less time to create the list than the image. However, adding elements is easy, as they only have to appended to the end of the list.
+	\subsubsection{Grid List}
+	Storing the data in a grid (figure \ref{fig:grid_list}, page \pageref{fig:grid_list}) has the advantage that we always know where a certain point in the dataset is and thus do not have to search for it. The disadvantages are the fixed size. On creation, the size and location of the datapoints have to be set and cannot be changed afterwards. This means that this type is unsuitable for dynamic datasets, where there new data is calculated continuously and added to the dataset. To add more data, a new grid has to be created and all the old (usable) data has to be copied into the new location, which is drains the available memory.
 	\begin{figure}[h!]
 		\centering
-		\caption{}
-		\label{fig:cluster}
-		\begin{tikzpicture}
-			\draw[step=1.0,black] (0, 0) grid (2,2);
-			
-			\draw[|-|] (0, 2.2) -- (1, 2.2) node[above] {width}-- (2, 2.2);
-			\draw[|-|] (2.2, 0) -- (2.2, 1) node[right] {height}-- (2.2, 2);
+		\caption{A Grid}
+		\label{fig:grid_list}
+		\begin{tikzpicture}[scale=2]
+		\draw[->] (1,-.5) node[right] {List} -- (1,-.1);
+		\draw[->] (-.5,1.125) node[left, align=right] {Entry number\\33} -- (-.1,1.125);
+		
+		\foreach \x in {
+			1,2,3,4,5,6,7,8} {
+			\foreach \y in {1,2,3,4,5,6,7,8} {
+				\foreach \num [evaluate = \num] in {int(\x + \y * 8 - 8)} {
+					\node at (\x / 4 - .125, \y / 4 - .125) {\num};
+				}
+			}
+		}
+		
+		\draw[step=.25, black, thick] (0, 0) grid (2,2);
+
 		\end{tikzpicture}
 	\end{figure}
+	\subsubsection{Multiple Recursive Sorted Lists}
+	The next version I came up with consists of lists containing lists. As seen in figure \ref{fig:cluster} (page \pageref{fig:cluster}), there is a mainlist containing four black quadrants. Similar to figure \ref{fig:grid_list} (page \pageref{fig:grid_list}), each square contains a value. However, the squares are not limited to have a single value. When new data is calculated in the region of the first square, the data can be stored in a new sublist. A sublist is a list which can contain values, or even new sublists. As seen in the figure, the sublist is structually the same as the mainlist, but the position and size are altered.\\
+	In the figure below, the mainlist is colored black and contains four sublists (red, green, blue and violet). The red sublist contains a cyan sub-sublist, or sublist of second order. The distance between the datapoints shrinks exponentially with the order of the sublist they are in.
+	
+	\begin{figure}[h!]
+		\centering
+		\caption{List in lists}
+		\label{fig:cluster}
+		\begin{tikzpicture}[scale=2]
+			\draw[step=.25, cyan] (.5,.5) grid (1,1);
+			\draw[step=.5, red] 	(0,0) grid (1,1);
+			\draw[step=.5, blue] 	(0,1) grid (1,2);
+			\draw[step=.5, green] 	(1,0) grid (2,1);
+			\draw[step=.5, violet] 	(1,1) grid (2,2);
+			\draw[step=1.0,black, ultra thick] (0, 0) grid (2,2);
+			
+			\draw[->, red] (-1.3, .5) node[below] {First Sublist} -- (-.1,.5);
+			\draw[->, green]	(3.3, .5) node[below] {Second Sublist} -- (2.1,.5);
+			\draw[->, blue] (-1.3, 1.5) node[above] {Third Sublist} -- (-.1, 1.5);
+			\draw[->, violet] (3.3, 1.5) node[above] {Fourth Sublist} -- (2.1,1.5);
+			\draw[->, cyan] (-1.3, .75) node[left, align = right] {Sublist of second order} -- (.4,.75);
+			\draw[->] (1,-.5) node[right] {Mainlist} -- (1,-.1);
+		\end{tikzpicture}
+	\end{figure}
+
 	\section{Libraries}
 	Used (or planned) libraries:\\
 	ffmpeg for video\\
@@ -361,4 +455,6 @@
 	This version updates the \verb|SettingsManager| to use a \verb|TreeMap| with strings as keys and objects as values. Previously, all the settings were sorted by their type in different classes (e.g. \verb|SettingViewport|). As of now, the settings are stored ordered (for performance reasons) in a \verb|TreeMap|. The main advantage is that adding a new setting is now not as cumbersome as it was before, because it suffices to add a new entry by calling the \verb|SettingsManager.addSetting(String name, Object value)| instead of having to create a new class for it or add an additional field. The drawbacks are longer retrieving times, as the whole map has to be searched for every value rather than retrieving one class and getting the value of one of its fields. Aside from this, the default settings are not hardcoded anymore but stored in a file named \verb|resources/settings/defaultsettings|. The \verb|resources| directory contains all files related to resources, i. e. data required for the program (in contrast to executable code).\\
 	In order to address the values without to type out the whole key, constants exists in the \verb|SettingsManager|. Their names should be self-explanatory. Values are retrieved by calling the \verb|SettingsManager.get(String name)| method. However, because the datatype of the setting is often already known, I have also implemented a few methods which automatically convert the value to a given type (\verb|getI|, \verb|getD| and \verb|getS| for integers, doubles and strings respectively). These methods throw an exception the setting requested does not exist.\\
 	Aside from the these changes, I made minor adjustments in the \verb|FileManager| class. All other classes have only be changed to accustom the new \verb|SettingsManager| class
+
+	\printbibliography
 \end{document}
