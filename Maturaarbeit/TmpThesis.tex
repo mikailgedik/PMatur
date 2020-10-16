@@ -17,6 +17,8 @@
 \usepackage[bookmarks]{hyperref}
 \author{Mikail Gedik}
 \title{Thesis Paper}
+%Ensures that \ref works with paragraphfs as intended
+\setcounter{secnumdepth}{6}
 \begin{document}
 	\pagenumbering{roman}
 	\maketitle
@@ -83,12 +85,311 @@
 	This section represents the core of my paper. The capabilities, structure and implementation are discussed in depth
 	\subsection{Program Functionalities}
 	\subsection{Structure}
-	\subsubsection{Core}
-	\subsubsection{GUI}
-	\subsubsection{Connector}
-	\subsection{Implementation}
-	\subsubsection{Data Management}
+	My program is separated in two halves, the GUI and core. While the latter is autonomous, the former is dependent on the core, as it must know its interface, which is the connecting bridge between them. The GUI can request or order a command through a command string or an integer, i. e. a character sequence or a number. The core answer these with a command result, which may also be an image.\\
+	Because the core is detached from the GUI, I may also develop multiple GUIs for different needs. The GUI in the diagram below shows a possible version of window-oriented GUI, which is relatively modern and user-friendly, but for example useless in a command line environment. Thus I see the need to develop different GUIs.
 	
+	\begin{figure}
+		\centering
+		\label{fig:program_structure}
+		\caption{Program structure}
+		\begin{tikzpicture}
+		%Front/Backend-connection
+		\draw[red, ultra thick, <-] (5,6.5) -- (7,6.5);
+		\node[above, align=center] at (6,6.5) {Command\\String};
+		
+		\draw[red, ultra thick, <-] (5,5) -- (7,5);
+		\node[above, align=center] at (6,5) {Command\\Integer};
+		
+		\draw[red, ultra thick, ->] (5,3.5) -- (7,3.5);
+		\node[below, align=center] at (6,3.5) {Command\\Result};
+		
+		\draw[red, ultra thick, ->] (5,2) -- (7,2);
+		\node[below, align=center] at (6,2) {Image\\Result};
+		
+		%Backend
+		\draw (0,0) rectangle (5,8);
+		\node[above] at (2.5, 8) {\textbf{Core}};
+		
+		%Interface
+		\draw (4,1) rectangle (5, 7);
+		\node[rotate = 90] at(4.5, 4) {Core Connector};
+		
+		%Settings
+		\draw (.5,7.2) rectangle (4.5, 7.8);
+		\node at (2.5, 7.5) {Settings};
+		
+		%Fractal calculator
+		\draw (1.5,4) rectangle (3.5, 6.5);
+		\node[align=center] at (2.5, 5.25) {Fractal\\Calculator};
+		
+		%Image render
+		\draw (1.5,1) rectangle (3.5, 3.5);
+		\node[align=center] at (2.5, 2.25) {Image\\Render};
+		
+		%File handling
+		\draw (0,1) rectangle (1, 7);
+		\node[rotate = 90] at(.5, 4) {File Handler};
+		
+		%Arrows
+		%Settings-Frac
+		\draw[ultra thick, ->] (2.5, 7.2) -- (2.5, 6.5);
+		%Int-Frac
+		\draw[ultra thick, <-] (3.5, 5.5) -- (4, 5.5);
+		%Frac-Image
+		\draw[ultra thick, ->]  (2.5, 4) -- (2.5, 3.5);
+		%Img-Int
+		\draw[ultra thick, ->]  (3.5, 2.5) -- (4, 2.5);
+		%Frac-File
+		\draw[ultra thick, <->] (1.5, 5.5) -- (1, 5.5);
+		%Image-File
+		\draw[ultra thick, ->] (1.5, 2.5) -- (1, 2.5);
+		%Settings-Int
+		\draw[ultra thick, ->] (4, 6.5) -- (3.75, 6.5) -- (3.75, 7.2); 
+		%Int-File
+		\draw[ultra thick, <->] (4.5, 1) -- (4.5,.5) -- (.5,.5) -- (.5, 1);
+		
+		%File system
+		\draw[green, ultra thick, dashed, ->] (-.25, 3.5) -- (.25, 3.5);
+		\draw[green, ultra thick, dashed, <-] (-.25, 4.5) -- (.25, 4.5);
+		\node[rotate = 90] at (-.5, 4) {File System};
+		
+		%Frontend
+		\draw (7,0) rectangle (12,8);
+		\node[above] at (9.5, 8) {\textbf{Windowed GUI}};
+		
+		%Interface
+		\draw (7,1) rectangle (8, 7);
+		\node[rotate = 90] at(7.5, 4) {GUI Connector};
+		
+		%Main
+		\draw (7.25,7.2) rectangle (11.75, 7.8);
+		\node at (9.5, 7.5) {Main/GUI-controller};
+		
+		%Window
+		\draw (8.5,4) rectangle (11.75, 6.5);
+		\node[align=center] at (10.125, 5.25) {Window};
+		
+		%Control Panels
+		\draw (8.5,1) rectangle (10.5, 3.5);
+		\node[align=center] at (9.5, 2.25) {Control\\Panels};
+		
+		%Listener
+		\draw (11,1) rectangle (12, 3.5);
+		\node[rotate = 90] at(11.5, 2.25) {Listener};
+		
+		%Arrows
+		%Main-Win
+		\draw[ultra thick, <->] (10.125 ,7.2) -- (10.125, 6.5);
+		%List-Win
+		\draw[ultra thick, ->] (11.5, 3.5) -- (11.5,4);
+		%Ctr-Win
+		\draw[ultra thick, <->] (9.5, 3.5) -- (9.5, 4);
+		%Main-Interface
+		\draw[ultra thick, <->] (8, 6.75) -- (8.5, 6.75) -- (8.5, 7.2);
+		
+		%Ctr-Interface
+		\draw[ultra thick, <-] (8, 2.25) -- (8.5, 2.25);
+		
+		%Keyboard/Mouse
+		\draw[green, ultra thick, dashed, ->] (11.5, 5.25) -- (12.25,5.25);
+		\node[rotate = 90] at (12.5, 5.25) {Display};
+		
+		\draw[green, ultra thick, dashed, <-] (11.75, 2.25) -- (12.25, 2.25);
+		\node[rotate = 90] at (12.5, 2.25) {Keyboard/Mouse};
+		\end{tikzpicture}
+	\end{figure}
+
+	\subsubsection{Core}
+	The core consists of multiple components or modules, which are tightly bound together. Each of them is responsible for a certain task and should not do anything else. The modules are only capable of communicating to each other and are isolated from the `outside', with the exception of the connector and file handler. The latter two interchange data with the UI or underlying file system.
+	\paragraph{Settings}
+	%Settingsmanager is simple list with keys (e.g name of the setting) and values. Some settings are relevant for rendering, some for the calculation. Some are variable, others are standart information like version
+	The settings for calculation are either used directly for computation or as parameters for the program itself. Variables used during the computation could be for example the \(C\) in the Julia set, numerals such as the maximal number of iterations allowed during computation or the color function used when coloring the calculated set. Other more technical information regarding the system, for instance available RAM, CPU name or the version of the program, may also be stored there. Although the word settings suggest that these values are changeable too during runtime, they are not meant to change. To see the difference between mutable and immutable values, changeable ones are prefixed with \verb|setting|, while the others are prefixed with \verb|value|.
+	\paragraph{Fractal Calculator}
+	%Handles calculation and organizes multithreading 
+	Upon receiving the command from the interface, the fractal calculator starts to calculate a set of points according to the parameters fetched from the settings module. After having created all necessary information to start the rendering process, the calculation's result is given either to the image render module or to the file handler. The fractal calculator is the core part of my thesis paper and I will spend most of my time tinkering with and finding optimizations for it.
+	\paragraph{Image Render Module}
+	%Creates images from the data
+	
+	The image render module creates images from the data calculated. A major advantage of this module is the buffering of data; Since the user will zoom in only gradually, new images created are often based on already used data. To make use of this, previously generated images are buffered and reused if possible.
+	\subparagraph{Color Function}
+	The color function maps the values of calculated points to colors. The simplest coloring is the in-out one, showing if a point has diverged or not. A more complex coloring method involves the amount of iterations a point had to take for its divergence, resulting in a much more colorful plot, and also showing the Mandelbrot's branches clearly.
+	\paragraph{File Handler}
+	The file handler abstracts the saving and reading process of fractals, videos or images. This module is the smallest one, since most of its implementation is already provided by the default library of Java.
+	%Abstracts saving and reading from the file system
+	\paragraph{Data Model}
+	The data model is the one of the most complex parts of my project. One of the toughest nuts to crack was the intelligent allocation and distribution of data, which was necessary to have low access time when searching specific points or areas in the dataset. To achieve this, the data is logically split in multiple layers: the levels and clusters. A level is container for multiple clusters, which in turn contain the data. All levels cover the same area, but with a different density of clusters, resulting in a different precision. One more caveat was RAM usage; My first algorithm was simpler and less sophisticated, and started using a massive amount of RAM to precache not yet calculated points. Although this made fetching data faster, it was unusable since the application was bound to crash after zooming in only a little bit.\\
+	\paragraph{Connector}
+	%Connector handles calls for the core. Sorts, creates, destroys and handles whole backend. Makes sure that rendered area is calculated
+	The connector manages calls from the UI to the backend, instructing the fractal calculator or image render module on what to do. Although this part is omittable since all the components could be called directly by the UI, I have added it because it abstracts and facilitates the usage of the core. Through this abstraction I have been able to make changes to the core without altering the UI.
+	\subsubsection{GUI}
+	The GUI (graphics user interface) is the mediator between the core and the user. It makes the program's capabilities, which are invoked through methods and functions, available to humans, only capable (without considering voice commands or touch screens) to interfere with the computer by mouse and keyboard. The GUI takes commands, which are issued by mouse clicks or keyboard strokes, and forwards them to the core. These commands usually yield a result, which is reported back to the GUI and shown to the user. For all this, a window is needed.
+	\subsection{Implementation}
+	This section sums up the central algorithms and structures which build my program.
+	\subsubsection{Helper Classes}
+	These structures do not contain any important algorithms or functionalities, but are used as wrappers for simple data. Since they are used often, I must make them trivial before being able to explain the more complex aspects of my program.
+	\paragraph{Region}
+	\paragraph{Logic Region}
+	\paragraph{Screen}
+	\subsubsection{Data Management}
+	Data calculated can be stored in many ways, from simple arrays to complex databanks. To understand the different approaches I have taken on storing data, I will have to explain the way computers store memory
+	\paragraph{Accessing RAM}
+	It has become trivial knowledge that computers work with zeroes and ones, but to understand the problems faced in storing data, I have to explain the principles a little further. To remember the values that my program has calculated, it stores them in the RAM. The RAM (random access memory) is essentially a gigantic collection of cells, each able to hold a single byte (one byte corresponds to eight bits, or eight zeroes or ones). To gain access to the memory, every cell has its own address, which is (on modern operating systems/computers) an 64 bit number. In since a 64 bit number is quite long, they are usually represented in hexadecimal format. In figure \ref{fig:memory_cells1} (page \pageref{fig:memory_cells1}) there is a schematic drawing of five memory cells, each labeled with their address (to make the numbers shorter, the addresses' length is only 16 bit). Each of these cells can hold a value $V$ between zero and 255 (that being the highest number a byte can represent).\\
+	After having set up the cells, which I will not go into detail since it is not relevant for my work, values can be passed to the cells. In figure \ref{fig:memory_cells2} (page \pageref{fig:memory_cells2}), the string \emph{HELLO} is stored (each letter corresponds to a numeric value, i. e. A equals 65, B equals 66 etc.). Since the characters are stored sequentially, it is not of importance to know the address of each letter; knowing the address $A_{\text{start}}$ of the first suffices, as the following letter's address $A_{\text{second}}$ can be calculated as follows $A_{\text{second}} = A_{\text{start}} + 1$.\\
+	Lists behave quite similarly to 
+	\cite{howstuffworks}
+	\begin{figure}
+		\centering
+		\caption{Memory cells, with addresses in hexadecimal format}
+		\label{fig:memory_cells1}
+		\begin{tikzpicture}
+			\draw[dashed] (-.5, 1) -- (5.5, 1);
+			\draw[dashed] (-.5, 0) -- (5.5, 0);
+			\draw[step = 1] (0,0) grid (5,1);
+			
+			\node at (0.5, .5) {$V_{2C}$};
+			\node at (1.5, .5) {$V_{2D}$};
+			\node at (2.5, .5) {$V_{2E}$};
+			\node at (3.5, .5) {$V_{2F}$};
+			\node at (4.5, .5) {$V_{30}$};
+			\node at (5.5, .5) {$V_{\dots}$};
+			
+			\node at (.5, -.5) {2C};
+			\node at (1.5, -.5) {2D};
+			\node at (2.5, -.5) {2E};
+			\node at (3.5, -.5) {2F};
+			\node at (4.5, -.5) {30};
+			\node at (5.5, -.5) {\dots};
+		\end{tikzpicture}
+	\end{figure}
+
+	\begin{figure}
+		\centering
+		\caption{Memory cells storing a simple string}
+		\label{fig:memory_cells2}
+		\begin{tikzpicture}
+		\draw[dashed] (-.5, 1) -- (5.5, 1);
+		\draw[dashed] (-.5, 0) -- (5.5, 0);
+		\draw[step = 1] (0,0) grid (5,1);
+		
+		\node at (.5, 1.5) {H};
+		\node at (1.5, 1.5) {E};
+		\node at (2.5, 1.5) {L};
+		\node at (3.5, 1.5) {L};
+		\node at (4.5, 1.5) {O};
+		
+		\node at (.5, .5) {72};
+		\node at (1.5, .5) {69};
+		\node at (2.5, .5) {76};
+		\node at (3.5, .5) {76};
+		\node at (4.5, .5) {79};
+		\node at (5.5, .5) {\dots};
+		
+				
+		\node at (.5, -.5) {2C};
+		\node at (1.5, -.5) {2D};
+		\node at (2.5, -.5) {2E};
+		\node at (3.5, -.5) {2F};
+		\node at (4.5, -.5) {30};
+		\node at (5.5, -.5) {\dots};
+		\end{tikzpicture}
+	\end{figure}
+
+	\paragraph{Storing an Image in RAM}
+	Since the RAM is a one dimensional space, allocating one dimensional objects like numbers, strings or similar things is quite easy. It suffices to know the length of the objects to know how much RAM has to be allocated, and figuring out which elements of the 
+	\subsubsection{Image Generation}
+	%take advantage of data arrangement, since sorted in clusters and levels and thus by precision
+	%naive algorithm: search for nearest datapoint
+	A less vital but still important aspect of my work is the visualization of the data. It is crucial to consider the way the data is stored when performing access-intense tasks, such as this. A more naive approach of mine search the whole dataset for each pixel colored, resulting in abysmal performance. By using a more sophisticated algorithm, the data can be directly mapped to the image without searching long for it. This section will go sequentially through all the steps taken.
+	\paragraph{Image Parameters}
+	\begin{figure}
+		\centering
+		\caption{Function Signature to create images}
+		\label{fig:image_signature}
+		\begin{verbatim}
+		public Screen createScreen(int minPixelWidth, int minPixelHeight, Region region,
+		                int threads, long maxWaitingTime)
+		\end{verbatim}
+	\end{figure}
+	To know what type of image the program has to create, parameters have to be passed to the function called. As seen in figure \ref{fig:image_signature} (page \pageref{fig:image_signature}), the first two refer to the (minimal) image constraints in pixels, \verb|region| describes the region of the fractal to render. \verb|threads| indicates the maximal, although not minimal, amount of CPU threads used to create the image, and \verb|maxWaitingTime| indicates how long the image creation can take before it is aborted to avoid blocking the application in case of an error, infinty loop or deadlock (although neither is likely to happen at all).\\
+	The returned \verb|Screen| has at least the dimensions given by the parameters, but is very likely to surpass them. Due to the mapping of the pixels the actually displayed region might vary by at most a single pixel, but I have deemed that negligible.	
+	\paragraph{Preparing the rendered Area}
+	In figure \ref{fig:region_over_dataset}, the starting point of the problem is visible. A clip of the dataset has to be mapped onto the red region. Using the given dimensions of the red area, the necessary precision of the datapoints can be derived. Through the precision, we can calculate the necessary level and get the smallest logic region which can fit the red area inside it (figure \ref{fig:logic_region_over_dataset}, page \pageref{fig:logic_region_over_dataset}). The logic region is needed to know from which level and place (index to be exact) in the dataset the data has to be queried, rending a long search for the datapoints redundant. The precision of the level is always better or equal to the precision of the requested image.	
+	\begin{figure}
+	\centering
+	\caption{The dataset region(black) and the requested region (red)}
+	\label{fig:region_over_dataset}
+		\begin{tikzpicture}
+			\draw[ultra thick,black, step=.5] (0,0) rectangle (4,3.5);
+			\draw[ultra thick,red] (0.6, .6) rectangle (3.1, 2.8);
+		\end{tikzpicture}
+	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\caption{The level, its clusters and the logic region in green}
+		\label{fig:logic_region_over_dataset}
+		\begin{tikzpicture}
+			\draw[ultra thick,black, step=.5] (0,0) grid (4, 3.5);
+			\draw[ultra thick,red] (0.6, .6) rectangle (3.1, 2.8);
+			\draw[ultra thick, green] (.5, .5) rectangle(3.5,3);
+		\end{tikzpicture}
+	\end{figure}
+	\paragraph{Image allocation}
+	Instead of allocating an empty image with the specified dimensions and filling it directly with data, the allocated image has the dimensions of the logical area. I have illustrated this in figure \ref{fig:logic_region_and_requested_area} (page \ref{fig:logic_region_and_requested_area}). The logic cluster width and height are both 5, the logical area has the width and height of 3. The requested area lies unaligned with the rest in the middle, with a width of 5 and a height of 6. As seen in the image, the region where data is fetched from has a greater precision as the red requested area; The values in the dataset lie closer to each other than in the area.\\
+	Following this example, the allocated image width is the logical cluster width times the logical region width (\(4 \times 5 = 20\)), and the image height is the logical cluster height times the logical area height (\(4 \times 6 = 24\)). The dimensions are measured in pixels. After it has been created, it can be immediately filled with data , which is a rather easy process since the pixels are by definition perfectly aligned with the data. In my program, this interim result is called \verb|ImageResult| and is cached for later usage(see section \ref{par:paragraph_image_creation_buffering}, page \pageref{par:paragraph_image_creation_buffering}) \\
+	After the image has been populated by the values, it can be cropped to the requested area. But as seen in figure \ref{fig:cropping the area} (page, \pageref{fig:cropping the area}), the cropped image's properties are not as requested. The image is wider and taller than asked for, but this is a rather minor problem since it does not degrade the quality and can be easily corrected by scaling the image down. A bigger problem regarding the accuracy is that the returned clipping is slightly bigger than requested.
+	
+	\begin{figure}
+		\centering
+		\caption{The logical area (green) with clusters and values (blue), and the requested region (red) with pixels}
+		\label{fig:logic_region_and_requested_area}
+		\begin{tikzpicture}
+			\draw[|-|,green] (0, -.3) -- (1.5, -.3) node[below] {Logical Width: 3}-- (3, -.3);
+			\draw[|-|,green] (-.3, 0) -- (-.3, 1.5) node[left] {Logical Height: 3}-- (-.3, 3);
+			
+			\draw[|-|,red] (0.4, 3.3) -- (1.4, 3.3) node[above] {Logical Width: 5}-- (2.4, 3.3);
+			\draw[|-|,red] (3.3, 0.4)-- (3.3, 1.6) node[right] {Logical Height: 6}-- (3.3, 2.8);
+			
+			\draw[|-|,blue] (2, 3.15) -- (2.5, 3.15) -- (3, 3.8) node[above] {Logical Width: 4} -- (2.5,3.15)-- (3, 3.15);
+			\draw[|-|,blue] (3.5, 2)-- (3.5, 2.5) node[right] {Logical Height: 4}-- (3.5, 3);
+			
+			\foreach \x in {0,1,2} {
+				\foreach \y in {0,1,2} {
+					\draw[blue, step=.25] (\x, \y) grid (\x +1, \y + 1);
+				}
+			};
+			\draw[ultra thick, green, step=1, opacity=.9] (0, 0) grid (3,3);
+			\draw[thick, red, step=.4] (0.4, 0.4) grid (0.4 + .4 * 5, 0.4 + .4 * 6);
+		\end{tikzpicture}
+	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\caption{Cropping the image to the area given by the parameters}
+		\label{fig:cropping the area}
+		\begin{tikzpicture}			
+		\foreach \x in {0,1,2} {
+			\foreach \y in {0,1,2} {
+				\draw[blue, step=.25] (\x, \y) grid (\x +1, \y + 1);
+			}
+		};
+		\draw[ultra thick, green, step=1, opacity=.9] (0, 0) grid (3,3);
+		\draw[thick, red, step=.4] (0.4, 0.4) grid (0.4 + .4 * 5, 0.4 + .4 * 6);
+		
+		\draw[->, blue] (3.2, 1.5) -- (3.8, 1.5);
+		\draw[blue, step=.25] (4.24999, .25) grid (4 + 2.5, 3);
+		\draw[thick, red, step=.4] (4.3999, 0.4) grid (4.4 + .4 * 5, 0.4 + .4 * 6);
+		
+		\end{tikzpicture}
+	\end{figure}
+	
+	\paragraph{Buffering} \label{par:paragraph_image_creation_buffering}
+	As mentioned above, generated \verb|ImageResult|s are cached for further usage. The reason becomes quite clear when thinking of the usual navigation in fractals. The user will often slowly zoom into a section of the set. This means for the render engine that it will create many images with a nearly identical area, thus being in the same logical area. Hence having a buffer filled with previously generated \verb|ImageResult|s can reduce the rendering time by much. Searching the buffer for a match takes place after knowing the logical area an image needs to be rendered. It is then checked against every entry in it, and if a suitable \verb|ImageResult| is found, it is taken and used instead of creating a new one from scratch. If this is not the case, a new \verb|ImageResult| has to strenuously be created and is afterwards added to the buffer.\\
+	An issue encountered with buffering is the increasing RAM usage. Since the buffer contains only data which can be recreated at medium cost, it is not necessary to let it grow infinitely. Limiting its size leads to less RAM usage, but potentially a higher performance impact.\\ The buffer is only useful in cases where the roughly the same area is rendered often, such as zooming in or moving our a little. As soon as the area is moved around or zoomed in too much, thus requiring a new logical area or new depth respectively, a new \verb|ImageResult| has to be created.
 	\subsubsection{GUI}
 	\section{Workflow and Major Version History}
+	
+	\clearpage
+	\appendix
+	\printbibliography
 \end{document}
