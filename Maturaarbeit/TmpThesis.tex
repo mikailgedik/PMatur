@@ -9,12 +9,16 @@
 \usepackage[left=2.00cm, right=2.00cm, top=2.00cm, bottom=2.00cm]{geometry}
 \usepackage{tikz}
 \usepackage{tikz-uml}
+\linespread{1}
 \usetikzlibrary{patterns}%for tikz https://tex.stackexchange.com/questions/54464/hatch-a-rectangle-in-tikz
 %sources
 \usepackage[backend=bibtex]{biblatex}
 \bibliography{Thesis}
 %Makes index browsable in pdf viewers and shows index in sidebar
 \usepackage[bookmarks]{hyperref}
+%Captions for figures in minipage
+\usepackage{caption}
+
 \author{Mikail Gedik}
 \title{Thesis Paper}
 %Ensures that \ref works with paragraphfs as intended
@@ -34,7 +38,7 @@
 	There are different types of fractals: geometric, algebraic and naturally occurring. Geometric and algebraic fractals are created by repeating a process over and over again. The Sierpinski triangle repeatedly cuts out the center piece of each black triangle \ref{fig:sierpinski_triangle_build}. The algebraic ones iterate have to iterate over an equation to determine its shape.\\
 	While they were first conceptualized by Felix Hausdorff in 1918, the term fractal (from Latin fragmented, broken) was only coined in 1975 by mathematician Benoit B. Mandelbrot. A factor in this long time span were the invention of computers, which made the exploration of fractals much easier due to their impressive computation power. Mandelbrot used fractals as a tool to examine the stock market, but were also found to be useful in various fields like physical chemistry, fluid mechanics and physiology. \cite{FractalFoundation}, \cite{FractalFoundation}, \cite{britannica}.
 	\begin{figure}[h]
-		\caption{Sierpi?ski triangle [\cite{Sierpinski}]}
+		\caption{Sierpi?ski triangle \cite{Sierpinski}}
 		\label{fig:sierpinski_triangle}
 		\centering
 		\includegraphics[width=0.5\textwidth]{"res/images/1000px-Sierpinski_triangle.svg.png"}
@@ -76,6 +80,14 @@
 	%finite fractal contains infinity/self-similarity. occurs in nature. equally rough at all scales. not possible to understand with classical geometry\cite{FractalsForDummies}.\\
 	%Never ending repeating branching pattern. (Infinitely complex). Made by repeating simple process often. Geometric fractals created by repeating simple process (sierpinski triangle). Algebraic fractals: repeat equation over and over \cite{FractalFoundation}:\\
 	%complex geometric shapes. Concept by Felix Hausdorff 1918. Are distinct from classical/Euclidean geometry (square, circle, sphere etc.). spatially nonuniform phenomena in nature (coastlines, mountain ranges). Word fractal (Latin for "fragmented", "broken") by mathematician Benoit B. Mandelbrot. Fractals as tools for different fields (stock market). Self-similar objects have remain invariant under changes of scale: they have scaling symmetry. Fractal dimension vs. euclidean dimension, a noninteger. Fractals are used to simulate nature (e. g. tree branches)\cite{britannica}
+	
+	%mathematics used to use classical analysis
+	%classical analysis cannot explain sets or functions which are too irregular
+	%have therefore been ignored and labled as curiosity
+	%New developement shows that irregular sets are better approximations of natural phenomens
+	%Tipical properties of fractals:
+	%self similarity, detailed microstructure, definition simple -> fractal complex, generated using recursion, no description possible using classic geometry, local geomtry not describable, size of set is infinity but size is zero
+	%\cite{FalconerKennethJ1993FG:m}
 	
 	\section{The Mandelbrot Set}
 	Although the most part of my thesis paper is dedicated to computer science the necessity arises to explain the most used fractal in my work. The Mandelbrot set was named after Benoit Mandelbrot, and is the first one to be called a fractal. In terms of properties, it is related to the Julia set, which is not a part of my work, albeit my program has the ability to display them. The Mandelbrot set is an algebraic fractal in the complex plane \(z = a + b i\). To find out which points are part of the set, we have to repeatedly apply the function \(z_{n+1} = z_{n}^2 + c\) to every point \(z\) in the plane. If the point diverges (or is known to diverge) as \(n\) approaches infinity, it is said to be outside the set. The most interesting points lie at the boundary of the set, as the edge is the most interesting part of any fractal.
@@ -228,14 +240,64 @@
 	\subsubsection{Helper Classes}
 	These structures do not contain any important algorithms or functionalities, but are used as wrappers for simple data. Since they are used often, I must make them trivial before being able to explain the more complex aspects of my program.
 	\paragraph{Region}
+	A the \verb|Region| class is a wrapper for a clip of the calculated set. It is defined by a start and end point. The coordinates are real floating point numbers, internally stored as primitive \verb|double|s. To avoid unintentional changes, the fields of the class are marked as final. Thus, there are only getter methods for the fields. To simplify the usage further, there are also methods to calculate the width and height of the clip.
 	\paragraph{Logic Region}
+	The \verb|LogicRegion| class has the same functionalities as the \verb|Region| class, but uses a different approach to store the data. Explaining the alternative method will be in vain without having read the section \ref{sec:data_management} regarding the data management, but may still be explained by using an example.
+	Imagine a box filled with apples. The box and apples both have fixed dimensions, as shown in figure \ref{fig:apples_in_box} (page \pageref{fig:apples_in_box}). The box and apples are an analogy to my program, which uses levels and clusters. An area of this box can now be defined using two different methods. The more intuitive way would to make the measurements in centimeters, i. e. the green arrows; the region starts at the point \((8\text{cm},8\text{cm})\) and ends at the point \((24\text{cm}, 32\text{cm})\). No matter how big or small the apples are, the region stays the same. Another way to define the area, illustrated by blue arrows, employs another metric. Instead of centimeters apples are used, thus defining the start at \((2\text{apples},2\text{apples})\) and the end at \((5\text{apples},4\text{apples})\). Note that the apple at \((5\text{apples},4\text{apples})\) is not in the clip, although it is used to define the clip. This is because when referring to an apple, the reference point is always the lower left corner. Although it might seem unfit to define it this way, there is another reason to do this. To get the dimensions, one can now simply subtract the start from the end point, which would otherwise give a wrong result (\((5\text{apples},4\text{apples}) - (2\text{apples},2\text{apples}) = (3\text{apples},2\text{apples})\)).\\
+	The logic region facilitates the access to clusters stored in a level by being able to directly access their position instead of having to deal with their absolute position. The implementation of this class is the same as the \verb|Region|, but it uses the \verb|int| instead of the \verb|double| type.
+	\begin{figure}
+		\centering
+		\begin{minipage}{.5\textwidth}
+			\captionof{figure}{Apples(red) in a box (black), as seen from above}
+			\label{fig:apples_in_box}
+			\begin{tikzpicture}
+			\draw[|-|] (0,-.3) -- (2.5,-.3) node[below] {40 cm} -- (5,-.3);
+			\draw[|-|] (-.3,0) -- (-.3, 2) node[left] {32 cm} -- (-.3,4);
+			
+			\draw[red, |-|] (0,-.6) -- (0.5,-.6) node[below] {8 cm} -- (1,-.6);
+			\draw[red, |-|] (-.6,0) -- (-.6, .5) node[left] {8 cm} -- (-.6,1);
+			
+			\foreach \x in {0,1,2,3,4} {
+				\foreach \y in {0,1,2,3} {
+					\draw[red] (.5 + \x, .5 + \y) circle[radius=.5];
+				}
+			}
+			\draw (0,0) rectangle (5,4);
+			\end{tikzpicture}
+		\end{minipage}
+		\begin{minipage}{.4\textwidth}
+			\captionof{figure}{Mesurements for normal region (green) vs. logic region(blue)}
+			\label{fig:apples_in_box_with_region}
+			\begin{tikzpicture}
+			\foreach \x in {0,1,2,3,4} {
+				\foreach \y in {0,1,2,3} {
+					\draw[opacity = .5, red] (.5 + \x, .5 + \y) circle[radius=.5];
+				}
+			}
+			\draw[opacity = .5] (0,0) rectangle (5,4);
+			
+			\draw[ultra thick] (1,1) rectangle (4,3);
+			
+			\draw[->, blue] (1,-1) node[below] {Start point is at (1,1)} -- (1,1);
+			\draw[->, green] (3.5,-.5) node[below] {Start point is at (8cm , 8cm)} -- (1,1);
+			
+			\draw[->, blue] (1,4.5) node[above] {End point is at (4,3)} -- (4,3);
+			\draw[->, green] (3.8,4.1) node[above] {End point is at (32cm , 24cm)} -- (4,3);
+			\end{tikzpicture}
+		\end{minipage}
+	\end{figure}
+
 	\paragraph{Screen}
-	\subsubsection{Data Management}
-	Data calculated can be stored in many ways, from simple arrays to complex databanks. To understand the different approaches I have taken on storing data, I will have to explain the way computers store memory
+	The \verb|Screen| class represents a rasterized image with fixed dimensions. Internally, a \verb|int[]| array stores all the data. The class provides various methods used in basic image manipulation. I had initially written this class long ago for other projects, but since I needed a class with these functionalities I have recycled it and added it to this project.
+	\subsubsection{Data Management}\label{sec:data_management}
+	Data calculated can be stored in many ways, from simple arrays to complex databanks. To understand the approach I have taken on storing data, I will have to explain the way computers store memory.
 	\paragraph{Accessing RAM}
-	It has become trivial knowledge that computers work with zeroes and ones, but to understand the problems faced in storing data, I have to explain the principles a little further. To remember the values that my program has calculated, it stores them in the RAM. The RAM (random access memory) is essentially a gigantic collection of cells, each able to hold a single byte (one byte corresponds to eight bits, or eight zeroes or ones). To gain access to the memory, every cell has its own address, which is (on modern operating systems/computers) an 64 bit number. In since a 64 bit number is quite long, they are usually represented in hexadecimal format. In figure \ref{fig:memory_cells1} (page \pageref{fig:memory_cells1}) there is a schematic drawing of five memory cells, each labeled with their address (to make the numbers shorter, the addresses' length is only 16 bit). Each of these cells can hold a value $V$ between zero and 255 (that being the highest number a byte can represent).\\
-	After having set up the cells, which I will not go into detail since it is not relevant for my work, values can be passed to the cells. In figure \ref{fig:memory_cells2} (page \pageref{fig:memory_cells2}), the string \emph{HELLO} is stored (each letter corresponds to a numeric value, i. e. A equals 65, B equals 66 etc.). Since the characters are stored sequentially, it is not of importance to know the address of each letter; knowing the address $A_{\text{start}}$ of the first suffices, as the following letter's address $A_{\text{second}}$ can be calculated as follows $A_{\text{second}} = A_{\text{start}} + 1$.\\
-	Lists behave quite similarly to 
+	It has become trivial knowledge that computers work with zeroes and ones, but to understand the problems faced in storing data, I have to explain the principles a little further. To remember the values that my program has calculated, it stores them in the RAM. The RAM (random access memory) is essentially a gigantic collection of cells, each able to hold a single byte (one byte corresponds to eight bits, or eight zeroes or ones). To gain access to the memory, every cell has its own address, which is (on modern operating systems/computers) a 64 bit number. Since a 64 bit number is quite long, they are usually represented in hexadecimal format. In figure \ref{fig:memory_cells1} (page \pageref{fig:memory_cells1}) there is a schematic drawing of five memory cells, each labeled with their address (to make the numbers shorter, the addresses' length is only 16 bit). Each of these cells can hold a value $V$ between zero and 255 (that being the highest number a byte can represent). How these cells are exactly accessed, set up and managed is quite interesting and complicated, but I will not discuss this in detail since it is not relevant for my work.\\
+	\subparagraph{Storing numbers}
+	Storing an number is quite simple. Figure \ref{fig:memory_cells2} (page \pageref{fig:memory_cells2}) shows two numbers, one eight and one sixteen bit, stored in the RAM. The eight bit number can have values from 0 to 255, since it cannot represent more values. As bigger numbers are required, the system reserves multiple cells and treats their value as a single one. Storing the number 2234, \((00001000\text{ }10111010)_2\) in binary format, requires two cells. The number is split between the cells, one holding the value \((00001000)_2 (= (8)_{10})\) and the other \((10111010)_2(=(186)_{10})\). Nowadays computers usually use 32 or 64 bit numbers, requiring four or eight bytes per number.
+	
+	\subparagraph{Storing lists}
+	The next step to storing single numbers is storing a list of numbers. Lists, often called arrays, are nothing more than many numbers lined up behind each other. Figure \ref{fig:memory_cells3} (page \pageref{fig:memory_cells3}) shows a list with five 1 byte elements. In computer science, list usually start at the index zero instead of one because it usually is easier to access them, as I will shortly explain. The zeroth element has the address \(2E\), the first \(2F\) and so on. Because each element's address can be easily expressed by the previous', it is only necessary to remember the zeroth's. Assuming \(A_{0}\) is the zeroth's address, the \(n\)th elements' can be determined using the formula \(A_{n}=A_{0} + n \times s\), where \(s\) is the amount of bytes each element needs, in this case one. Giving an example, the third elements address \(A_{3}\) is equals to \(2E + 3 \times 1 = 31\).
 	\cite{howstuffworks}
 	\begin{figure}
 		\centering
@@ -261,30 +323,28 @@
 			\node at (5.5, -.5) {\dots};
 		\end{tikzpicture}
 	\end{figure}
-
+	
 	\begin{figure}
 		\centering
-		\caption{Memory cells storing a simple string}
+		\caption{Memory cells storing a numbers}
 		\label{fig:memory_cells2}
 		\begin{tikzpicture}
 		\draw[dashed] (-.5, 1) -- (5.5, 1);
 		\draw[dashed] (-.5, 0) -- (5.5, 0);
 		\draw[step = 1] (0,0) grid (5,1);
 		
-		\node at (.5, 1.5) {H};
-		\node at (1.5, 1.5) {E};
-		\node at (2.5, 1.5) {L};
-		\node at (3.5, 1.5) {L};
-		\node at (4.5, 1.5) {O};
+		\node at (.5, 1.5) {8};
 		
-		\node at (.5, .5) {72};
-		\node at (1.5, .5) {69};
-		\node at (2.5, .5) {76};
-		\node at (3.5, .5) {76};
-		\node at (4.5, .5) {79};
+		\draw[|-|] (2, 1.5) -- (3, 1.5) node[above] {2234} -- (4, 1.5);
+		
+		\node at (.5, .5) {8};
+		\node at (1.5, .5) {$\dots$};
+		\node at (2.5, .5) {8};
+		\node at (3.5, .5) {186};
+		\node at (4.5, .5) {$\dots$};
 		\node at (5.5, .5) {\dots};
 		
-				
+		
 		\node at (.5, -.5) {2C};
 		\node at (1.5, -.5) {2D};
 		\node at (2.5, -.5) {2E};
@@ -293,9 +353,184 @@
 		\node at (5.5, -.5) {\dots};
 		\end{tikzpicture}
 	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\caption{Memory cells storing an array}
+		\label{fig:memory_cells3}
+		\begin{tikzpicture}
+		\draw[dashed] (-.5, 1) -- (8.5, 1);
+		\draw[dashed] (-.5, 0) -- (8.5, 0);
+		\draw[step = 1] (0,0) grid (8,1);
+		
+		\draw[->] (2.5, 1.5) node[above] {0th element} -- (2.5, 1.1);
+		
+		\draw[->] (5.5, 1.5) node[above] {3rd element} -- (5.5, 1.1);
+		
+		\node at (.5, .5) {\dots};
+		\node at (1.5, .5) {\dots};
+		\node at (2.5, .5) {5};
+		\node at (3.5, .5) {42};
+		\node at (4.5, .5) {45};
+		\node at (5.5, .5) {31};
+		\node at (6.5, .5) {52};
+		\node at (7.5, .5) {\dots};
+						
+		\node at (.5, -.5) {2C};
+		\node at (1.5, -.5) {2D};
+		\node at (2.5, -.5) {2E};
+		\node at (3.5, -.5) {2F};
+		\node at (4.5, -.5) {30};
+		\node at (5.5, -.5) {31};
+		\node at (6.5, -.5) {32};
+		\node at (7.5, -.5) {\dots};
+		\end{tikzpicture}
+	\end{figure}
 
-	\paragraph{Storing an Image in RAM}
-	Since the RAM is a one dimensional space, allocating one dimensional objects like numbers, strings or similar things is quite easy. It suffices to know the length of the objects to know how much RAM has to be allocated, and figuring out which elements of the 
+	\subparagraph{Storing an Image in RAM}
+	Since the RAM is a one dimensional space, allocating one dimensional objects like numbers, lists or similar things is quite easy. It suffices to know the size of the elements to access one. Storing multidimensional objects requires two map them to a single dimension.\\
+	In case of an image, each pixel has two indexes denoting the locations on the abscissa and ordinate axes. The pixels are thus describe by two identifiers, making them two dimensional. To store them in RAM, the two indexes have to be converted into a single identifier. Figure \ref{fig:2d_to_1d} (page \pageref{fig:2d_to_1d}) shows this transition. On the left, each pixel \(P_{x,y}\) is described using two indices \(x, y\), while on the right the pixels \(P_{i}\) are described by the single index \(i\). The goal is to find a way to transform the indices \(x, y\) to a single index. By defining \(i = x + 3 \times y\), both indices are mapped to a single one.
+	
+	\begin{figure}
+		\centering
+		\caption{Mapping a two dimensional image to a single dimension}
+		\label{fig:2d_to_1d}
+		\begin{tikzpicture}
+			\draw (0,0) grid (3,3);
+			\foreach \y in {0,1,2} {
+				\foreach \x in {0,1,2} {
+					\node at (\x + .5, \y + .5) {$P_{\x,\y}$};
+				}
+			}
+		
+			\draw (4,0) grid (7,3);
+			\foreach \x in {0,1,2} {
+				\node at (4 + \x + .5, .5) {$P_{\x}$};
+			}
+			\foreach \x in {3,4,5} {
+				\node at (1 + \x + .5, 1 + .5) {$P_{\x}$};
+			}
+			\foreach \x in {6,7,8} {
+				\node at (-2 + \x + .5, 2 + .5) {$P_{\x}$};
+			}
+		\end{tikzpicture}
+	\end{figure}
+	
+	\subsubsection{The Dataset}
+	The dataset is responsible for the storage, access and management of values calculated by my program. Implementation wise, the central parts are located in the \verb|DataSet| class, which contains all methods relevant for the management. The classes \verb|Level|, \verb|Cluster| and \verb|Value| help sorting the data in logically aligned subsets. Figure \ref{fig:dataset_hierarchy} (page \pageref{fig:dataset_hierarchy}) shows the components hierarchically. The dataset contains levels and these contain cluster which are made of values.
+	
+	\begin{figure}
+		\centering
+		\caption{The structure of the dataset}
+		\label{fig:dataset_hierarchy}
+		\begin{tikzpicture}
+			
+			\draw (0, 0) rectangle (10,3);
+			\foreach \level in {0,3,6} {
+				\draw[red] (\level+1, .5) rectangle (\level+3, 2.5);
+				\foreach \cx/\cy in {0/0,0/1,1/0,1/1} {
+					\draw[blue, step=.1] (\level+1 + \cx + .2, \cy+.7) grid (\level+.8 + \cx + 1.01 , \cy + 1.3);
+				}
+			}
+			\draw[green] (7.2, .7) rectangle (7.3,.8);
+			\node[above] at (5, 3.5) {Dataset};
+			\draw[red,   ->] (1.5, -.2) node[below] {Level} -- (1.5, .4);
+			\draw[blue,  ->] (4.5, -.2) node[below] {Cluster} -- (4.5, .6);
+			\draw[green, ->] (7.25, -.2) node[below] {Value} -- (7.25, .65);
+		\end{tikzpicture}
+	\end{figure}
+	\paragraph{Basic understanding}
+	All values calculated are stored in the \verb|Value| class. This class is a wrapper for a single value. The job of the dataset is to store these in a way that they are quickly accessible. The first viable solution is to store them in a single big list. This however has the drawback that the entire list has to be searched for a value. The solution to this was to group values in an area together to form a so-called cluster. These are then again sorted by their precision into different levels. Figure \ref{fig:dataset_actual} (page \pageref{fig:dataset_actual}) shows how the data is stored, taking the actual position of the data into account. 
+	
+	\begin{figure}
+		\centering
+		\caption{The actual of the dataset shown with the Cartesian coordinate system, taking position into account\newline The dataset/level is black, clusters are blue and values are green}
+		\label{fig:dataset_actual}
+		\begin{tikzpicture}
+			\draw[->] (-1,-1.3) -- (-1,4) node[right] {$y$};
+			\draw[->] (-1.3,-1) -- (4,-1) node[right] {$x$};
+			\foreach \cx  in {0,1,2,3} {
+				\foreach \cy  in {0,1,2} {
+					\draw[thick, blue] (\cx,\cy) rectangle (\cx+1,\cy+1);
+					\foreach \px  in {0,1,2} {
+						\foreach \py  in {0,1,2,3} {
+							\fill[green] ({\cx + \px * 0.25 + .25}, {\cy + \py * 0.2 + .2}) circle[radius=.05];
+						}
+					}
+				}
+			}
+			\draw[ultra thick] (0,0) node[below] {$(1|1)$} rectangle (4,3) node[right] {$(5|4)$};
+		\end{tikzpicture}
+	\end{figure}
+	
+	\subparagraph{Value}
+	The value wraps a single value. It contains no other data, not even the location which the data corresponds to. These are determined by the position of the cluster and the index of the value in the cluster.
+	\subparagraph{Cluster}
+	A cluster is a collection of values. As seen in figure \ref{fig:dataset_actual} (page \pageref{fig:dataset_actual}), a the values contained are in a rectangle. The width can be measured in two ways: either the absolute width \(w_{\text{cls,abs}}\), referring to the width of cluster's area, or the logical width \(w_{\text{cls,log}}\), expressing the width in amount of values. In the figure, \(w_{\text{cls,log}} = 3\) and \(w_{\text{cls,abs}} = 1\) can easily be interpreted. The same rule can be applied to the height, expressed by \(h_{\text{cls,log}}\) and \(h_{\text{cls,abs}}\).\\
+	In a dataset all clusters are required to have the same logical dimensions. The absolute width and height, as well as the position, can vary.
+	\subparagraph{Level}
+	The level is a list of clusters. Similar the aforementioned, it has two different ways to measure its dimension. An absolute, referring to area of the set it covers (\(w_{\text{lev,abs}}\) and \(h_{\text{lev,abs}}\)), and a logical, involving the amount of clusters it contains. The main difference is that all levels in a dataset have the same absolute dimensions. In figure \ref{fig:dataset_different_levels} (page \pageref{fig:dataset_different_levels}), three levels of a dataset are shown. All span from the point \((1|1)\) to \((4|3)\). However, the amount of clusters they fit is different. The table shows the values that change with the depth \(d\), which describes how many values a level contains.
+	\begin{figure}
+		\centering
+		\caption{Different levels in the same dataset}
+		\label{fig:dataset_different_levels}
+		\begin{minipage}{.4\textwidth}
+			\centering
+			\begin{tikzpicture}
+				\draw[->] (-1,-1.3) -- (-1,3) node[right] {$y$};
+				\draw[->] (-1.3,-1) -- (4,-1) node[right] {$x$};
+				\draw[step=.25,blue] (0,0) grid (3,2);
+				\foreach \x in {0,...,23} {
+					\foreach \y in {0,...,15} {
+						\fill[green] (.125*.5 + 0.125 * \x, .125*.5 + 0.125 * \y) circle[radius=.03];
+					}
+				}
+				\draw[ultra thick] (0,0) node[below] {$(1|1)$} rectangle (3,2) node[right] {$(4|3)$};
+			\end{tikzpicture}
+		\end{minipage}%
+		\begin{minipage}{.4\textwidth}
+			\centering
+			\begin{tikzpicture}
+				\draw[->] (-1,-1.3) -- (-1,3) node[right] {$y$};
+				\draw[->] (-1.3,-1) -- (4,-1) node[right] {$x$};
+				\draw[step=.5,blue] (0,0) grid (3,2);
+				\foreach \x in {0,...,11} {
+					\foreach \y in {0,...,7} {
+						\fill[green] (.125 + 0.25 * \x, .125 + 0.25 * \y) circle[radius=.03];
+					}
+				}
+				\draw[ultra thick] (0,0) node[below] {$(1|1)$} rectangle (3,2) node[right] {$(4|3)$};
+			\end{tikzpicture}
+		\end{minipage}
+		\begin{minipage}{.4\textwidth}
+			\centering
+			\begin{tikzpicture}
+				\draw[->] (-1,-1.3) -- (-1,3) node[right] {$y$};
+				\draw[->] (-1.3,-1) -- (4,-1) node[right] {$x$};
+				\draw[step=1,blue] (0,0) grid (3,2);
+				\foreach \x in {0,...,5} {
+					\foreach \y in {0,...,3} {
+						\fill[green] (.25 + 0.5 * \x, .25 + 0.5 * \y) circle[radius=.03];
+					}
+				}
+				\draw[ultra thick] (0,0) node[below] {$(1|1)$} rectangle (3,2) node[right] {$(4|3)$};
+			\end{tikzpicture}
+		\end{minipage}
+		\begin{minipage}{.4\textwidth}
+			\centering
+				\begin{tabular}{c|c|c|c|c}
+					&\(w_{\text{lev,abs}}\)&\(h_{\text{lev,abs}}\)&\(w_{\text{lev,log}}\)&\(h_{\text{lev,log}}\)\\\hline
+					Level 1&3&2&3&2\\\hline
+					Level 2&3&2&6&4\\\hline
+					Level 3&3&2&12&8\\
+				\end{tabular}		
+		\end{minipage}
+	\end{figure}
+	
+	\subparagraph{Dataset}
+	The dataset stores all levels, clusters and values and provides methods to access them. It defines all the parameters used, such as \(h_{\text{lev,abs}}\) or \(w_{\text{cls,log}}\).
+	\paragraph{Implementation}
+	
 	\subsubsection{Image Generation}
 	%take advantage of data arrangement, since sorted in clusters and levels and thus by precision
 	%naive algorithm: search for nearest datapoint
@@ -388,6 +623,18 @@
 	An issue encountered with buffering is the increasing RAM usage. Since the buffer contains only data which can be recreated at medium cost, it is not necessary to let it grow infinitely. Limiting its size leads to less RAM usage, but potentially a higher performance impact.\\ The buffer is only useful in cases where the roughly the same area is rendered often, such as zooming in or moving our a little. As soon as the area is moved around or zoomed in too much, thus requiring a new logical area or new depth respectively, a new \verb|ImageResult| has to be created.
 	\subsubsection{GUI}
 	\section{Workflow and Major Version History}
+	
+	\section{Reflection}
+	Programming an application of this size has come with many unexpected challenges which are tied to the nature of computer science. These challenges have, when not accounted for, caused either several delays in my time schedule or forced me to not implement a feature. One of the most banal and trivial hardships encountered are logical errors in the code, causing either simple misbehavior or runtime crashes. These can be prevented 
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	\clearpage
 	\appendix
