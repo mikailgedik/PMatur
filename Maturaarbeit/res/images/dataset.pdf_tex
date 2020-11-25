@@ -1,0 +1,84 @@
+%% Creator: Inkscape inkscape 0.92.5, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'dataset.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{709.69266156bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.37921212)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{dataset.pdf}}%
+    \put(0.45366755,0.34431385){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Dataset\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{dataset.pdf}}%
+    \put(0.21068455,0.2180011){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Level 1\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{dataset.pdf}}%
+    \put(0.70972438,0.24897196){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Level 3\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{dataset.pdf}}%
+    \put(0.46511488,0.17096231){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Level 2\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{dataset.pdf}}%
+    \put(0.03505467,0.17520551){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 1\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{dataset.pdf}}%
+    \put(0.09364209,0.09137625){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 8\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{dataset.pdf}}%
+    \put(0.26717767,0.08473632){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 7\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{dataset.pdf}}%
+    \put(0.53101343,0.02215383){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 1\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{dataset.pdf}}%
+    \put(0.36158413,0.02882711){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 4\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{dataset.pdf}}%
+    \put(0.86553463,0.17897316){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 1\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{dataset.pdf}}%
+    \put(0.61723492,0.0894945){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 3\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{dataset.pdf}}%
+    \put(0.77120498,0.11894167){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 2\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{dataset.pdf}}%
+    \put(0.88697895,0.30908828){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Cluster 5\\\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=14]{dataset.pdf}}%
+  \end{picture}%
+\endgroup%
