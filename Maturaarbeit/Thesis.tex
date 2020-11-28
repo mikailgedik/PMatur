@@ -1,5 +1,5 @@
 % !TeX spellcheck = en_US
-\documentclass[10pt,a4paper,titlepage]{article}
+\documentclass[12pt,a4paper,titlepage]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
@@ -12,18 +12,18 @@
 \usepackage{tikz}
 \usepackage{tikz-uml}
 \usepackage{wallpaper}
-\linespread{1}
+\linespread{1.3}
 \usetikzlibrary{patterns}%for tikz https://tex.stackexchange.com/questions/54464/hatch-a-rectangle-in-tikz
 \usetikzlibrary{svg.path}
 %sources
 \usepackage[backend=bibtex,style=alphabetic]{biblatex}
 \bibliography{Thesis}
-%Makes index browsable in pdf viewers and shows index in sidebar
-\usepackage[hidelinks]{hyperref}
+
 %Captions for figures in minipage
 \usepackage{caption}
 
-%\author{Mikail Gedik}
+%Makes index browsable in pdf viewers and shows index in sidebar
+\usepackage[hidelinks]{hyperref}
 %Ensures that \ref works with paragraphfs as intended
 \setcounter{secnumdepth}{6}
 
@@ -57,19 +57,19 @@
 	Contrary to its appearance, the definition of the Sierpiński triangle is thus quite simple. Furthermore, it is a recursive. Both these properties are often also characteristic of other fractals.\\
 	Although it lies outside the scope of this paper, the Hausdorff dimension is also worth mentioning. Broadly speaking, the Hausdorff dimension is a real number (as opposed to the topological dimensions, which are always integers) which describes how much space a set fills up and it is usually greater than its topological dimension \cite[Einleitung]{FalconerKennethJ1993FG:m}.
 	
-	\begin{figure}[h]
+	\begin{figure}
 		\caption{Sierpiński triangle \cite{sierpinski_image}}
 		\label{fig:sierpinski_triangle}
 		\centering
 		\includegraphics[width=0.5\textwidth]{"res/images/1000px-Sierpinski_triangle.svg.png"}
 	\end{figure}
-	\begin{figure}[h]
+	\begin{figure}
 		\caption{Each branch of the snowflake creates new smaller branches \cite{wikipedia_snowflake}}
 		\label{fig:snowflake}
 		\centering
 		\includegraphics[width=0.5\textwidth]{"res/images/bentley_snowflake.jpg"}
 	\end{figure}
-	\begin{figure}[h]
+	\begin{figure}
 		\caption{Creation of the Sierpinski triangle}
 		\label{fig:sierpinski_triangle_build}
 		\centering
@@ -496,17 +496,25 @@
 	If the power of the current machine is not sufficient for the calculations, the work can be split over other machines via Internet. One computer then acts as the ``master'', which organizes the calculation. All other machines are ``slaves'' and connect to the master to offer him their services. From the calculators perspective the slaves are calculator units, and thus sees no difference between a remote machine and for example an installed GPU. The units wrapping remote computers have of course a different implementation than the normal ones. They have to handle the connection and make sure that data is sent and received correctly.\\
 	One central thing to consider when using remote connections is the latency. While commands can be sent almost instantly to a GPU it may take many milliseconds to send it to another machine over the Internet, which is a lot on a computer that can perform hundreds of operations in just a picosecond. It is thus crucial to send as little data as possible. This can be achieved by buffering data, which means that the program avoids sending many small datapackets but instead sends few big ones.
 	\subsubsection{Image Generator}\label{sec:image_generation}
-	The last step in my program is the visualization of the data. The image generator queries the data needed from the dataset and maps the values to a color. The procedure is divided in multiple smaller steps, which are illustrated in Figure \ref{fig:img_gen}. The yellow grid represents the image, where each cell is a pixel.\\
-	\paragraph{Figure One to Four}
+	The last act to functionality in my program is the visualization of the data, which is done by the image generator. It queries the data needed from the dataset and maps the values to a color. The procedure is divided in multiple smaller steps, which are illustrated in Figure \ref{fig:img_gen}. The yellow grid represents the image, where each cell is a pixel.
+	\paragraph{Step One to Four}
 	When the program wants to create an image the parameters have to be given, which are the width \(I_{l,w}\) and height \(I_{l,h}\) in pixels and the area to render, whose width and height are given by \(I_{a,w}\) and \(I_{a,h}\). It should be trivial that \(\frac{I_{l,h}}{I_{l,w}} = \frac{I_{a,h}}{I_{a,w}}\). With the help of these the image generator finds out which points of the dataset are needed. Because the pixels are on a raster, the distance \(p(I)\) between two neighboring pixels is always the same, meaning that the datapoints used to create it have too the same distance to the their neighbors. This comes in handy since the dataset sorts the points by the same metric, meaning that the points needed for the image are all in one level \(L(I)\). While it might seem that \(p(I) = p(L(I))\) so that the points can be matched exactly it is suffices that \(p(I) \geq p(L(I))\). The will be harked back later. When the level is known, the clusters needed can be determined. This is done by simply determining which clusters overlap with the area of the image.
-	\paragraph{Figure }
+	\paragraph{Step five and six}
+	The clusters are mapped to an interim image \(R(I)\), which has as inferred from the figure the same amount of pixels as all needed clusters have points. Each point then corresponds to a pixel, which is colored according to the point's value. To determine which value corresponds to which color the program utilizes a color function, which takes a value as an argument and returns the color (in hexdecimal RGB format) associated with it. Note that the function also depends on the maximal amount of iterations the program tried on that point. The color function can be freely manipulated by the user before starting the image creator since it is coded in OpenCL.\\
+	The interim image covers as seen in the figure more area than requested. It is thus cropped down. But this alone does not suffice, the image also has to be scaled down to the resolution given by the requested image. This is because the \(p(L(I))\), which was used for \(R(I)\), is equals or smaller than \(p(I)\). This can broadly be interpreted that \(R(I)\) has ``smaller'' pixels than \(R(I)\), thus needing more pixels to fill the same area. The scaled image can then be returned to the caller.\\
+	Attentive readers might detect an issue here: the points are moved slightly around to fit the next best pixels location, shifting the image slightly. Although this is a greater issues on this example with such a small image, but this effect becomes negligible on bigger images, since the points are moved at most by one pixel.\\
+	A much greater quality issue is the scaling algorithm (called ``nearest neighbor''). Because my work does not focus on that aspect, I have used the most simple one, which while being fast can have drastic quality issues. This can is best seen in videos, where a lot of noise is generated.\\
+	\paragraph{Buffering of \(R(I)\)}
+	While moving around and zooming around, the user often sees the approximately same area, meaning that for these images the same clusters are going to be rendered. I this thus sensible to store the \(R(I)\) generated in a buffer. If a new image has to be created the image creator checks first if the area has already once been rendered, and if so it can skip step five, which is the most time costly. The drawback is that these stored images will with time slowly use a lot of memory.
+	\paragraph{Video creation}
+	It is also possible to create a video in my program. A video is nothing more than many images displayed fastly one after another. The program thus just creates many images and connects them to a video. The process of combining images to a video is done by invoking a specialized program called FFMPEG \cite{FFMPEG}, which has to be installed on the system in order to be used. Since the video creation is not particularly interesting I will not go in greater depth than this.
 	\begin{figure}
 		\centering
 		\caption{Image generation course}
 		\label{fig:img_gen}
 		\begin{minipage}{.4\textwidth}
 			\centering
-			\caption*{Image Parameters}
+			\caption*{1: Image Parameters}
 			\begin{tikzpicture}
 			\draw[ultra thick, yellow,step=.4] (0,0) grid (1.6,1.2);
 			\draw[|<->|, yellow, thick] (-.4, 0) -- (-.4, .6) node[left] {\(I_{l,h} = 3\)} -- (-.4, 1.2);
@@ -518,7 +526,7 @@
 		\end{minipage}
 		\begin{minipage}{.4\textwidth}
 			\centering
-			\caption*{Image location and size, whole dataset for reference}
+			\caption*{2: Image location and size, whole dataset for reference}
 			\begin{tikzpicture}
 			\node at (2,2) {\includegraphics[width=4cm, height=4cm]{res/images/mandelbrot.png}};
 			\draw[thick, orange, ->] (-.3,2) -- (4.3,2) node[right]{\(Re\)};
@@ -535,7 +543,7 @@
 		\end{minipage}
 		\begin{minipage}{.4\textwidth}
 			\centering
-			\caption*{Selecting the level}
+			\caption*{3: Selecting the level}
 			\begin{tikzpicture}
 			\node at (2,2) {\includegraphics[width=4cm, height=4cm]{res/images/mandelbrot.png}};
 			\draw[ultra thick, blue] (0,0) rectangle (4,4);
@@ -544,26 +552,57 @@
 					\fill[green] (.25 * \x + .125, .25 * \y + .125) circle[radius=.05];
 				}	
 			}
+			\draw (4.3, .625) -- (4.3, .75);
 			\draw[ultra thick, yellow,step=.4] (1.199,1.199) grid (2.8,2.4);
 			\end{tikzpicture}
 		\end{minipage}
 		\begin{minipage}{.4\textwidth}
 			\centering
-			\caption*{Selecting the clusters}
+			\caption*{4: Selecting the clusters}
 			\begin{tikzpicture}
 			\node at (2,2) {\includegraphics[width=4cm, height=4cm]{res/images/mandelbrot.png}};
 			\draw[ultra thick, blue] (0,0) rectangle (4,4);
-			\draw[step=.5,red, dashed] (.99,.99) grid (3,2.5);
+			\draw[step=1,red, dashed] (.99,.99) grid (3,3);
 			\foreach \x in {4,...,11} {
-				\foreach \y in {4,...,9}{
+				\foreach \y in {4,...,11}{
 					\fill[green] (.25 * \x + .125, .25 * \y + .125) circle[radius=.05];
 				}
 			}
 			\draw[ultra thick, yellow,step=.4] (1.199,1.199) grid (2.8,2.4);
 			\end{tikzpicture}
 		\end{minipage}
+		\begin{minipage}{.4\textwidth}
+			\centering
+			\caption*{5: Creating an image from the clusters}
+			\begin{tikzpicture}
+			\draw[step=1,red, dashed] (0,0) grid (2,2);
+			\foreach \x in {0,...,7} {
+				\foreach \y in {0,...,7}{
+					\fill[green] (.25 * \x + .125, .25 * \y + .125) circle[radius=.05];
+				}
+			}
+			\draw[->] (2.3, .75) -- (2.7, .75);
+			\draw[step=.25, violet, thick] (2.99,0) grid (5,2);
+			\node[above] at (4, 2) {\(R(I)\)};
+			\end{tikzpicture}
+		\end{minipage}
+		\begin{minipage}{.4\textwidth}
+			\centering
+			\caption*{6: Cropping and scaling the interim result}
+			\begin{tikzpicture}
+			\draw[step=.25, violet, thick] (0,0) grid (2,2);
+			\node[above] at (1, 2) {\(R(I)\)};
+			\draw[ultra thick, yellow,step=.4,shift={(.2,.2)}] (0,0) grid (1.6,1.2);
+			\draw[->] (2.3, .75) -- (2.7, .75);
+			
+			\draw[step=.25, violet, thick,shift={(3,0)}] (0,0) grid (2,1.5);
+			\draw[ultra thick, yellow,step=.4,shift={(3.2,.2)}] (0,0) grid (1.6,1.2);
+			\end{tikzpicture}
+		\end{minipage}
 	\end{figure}
-	\subsection{Internal Process Course}
+	\subsection{Data Calculation and Image Generation Course}
+	This section will shorty cover the programs executions course, tying the previously discussed sections together. When the program starts, the dataset is initialized. The parameters passed to it during its creation are the location of the dataset, \(f\), \(l_{a,a}\), \(l_{a,h}\), \(l_{l,w}(L_0)\), \(l_{l,h}(L_0)\), \(c_{l,w}\) and \(c_{l,h}\). The initial parameters are defined in the settings and can be changed there. They are used to deduce the parameters of any other level, cluster or point.\\
+	When a new image is needed, the connector asks the dataset for the clusters needed. If any of these clusters have not yet been calculated the connector sends them to the fractal calculator to create them. Next, the image creator checks if the clusters has already been rendered once as an interim result, and renders the clusters if not. The interim result is then cropped and resized, and then finally sent back to the GUI which has requested the image.
 	\section{Reflection}
 	I would like to use this last section of my work to add my personal thoughts to my senior paper and to neatly close the discussion around my work.
 	\subsection{Limitations, Bugs and Workarounds}
@@ -600,14 +639,12 @@
 	The default iteration model is named ``static'' and uses the same amount of iterations for every level. A not thoroughly tested variant named ``antiProportional'' can be selected in the settings, which increases the amount of iterations anti proportionally.
 	\subsection{Conclusion}
 	As described section \ref{sec:poss_enh} I was not able to implement every aspect I wanted to be included. However I can proudly present a program that meets all basic requirements I have given, such as being able to harness the power of a graphics card or exporting videos. Looking back at my work I can say that I made the mistake of investing too much time in the program and by far not enough in the paper. I had not thought that writing down my ideas in an understandable way was going to take way less time. Lastly I would like to thank Mr. Holzer for giving advice, guiding and supporting me through my first greater piece of work.
-	\clearpage
 	\printbibliography
 	
-	
-	
-	
 	\newcommand{\glossaryentry}[2]{\textbf{#1}&#2\\} %add to the top of the document
-	\section{Glossaire} % add this to where you want your glossary to be
+	\appendix
+	\section{User Guide for the Program}
+	\section{Glossary} % add this to where you want your glossary to be
 	\noindent
 	\begin{tabular}{@{}p{4cm}@{\hspace{12pt}}p{0.75\textwidth}@{}}
 		\glossaryentry{term}{asldjfdsalkf lslökaslköflsadk jlksadj lsa djlsa jdkösaljk lsdkjf lasfj asdj fdsa jfo ijsd ffdsalöjsadj ldsa jflsdajöl jdsl lsa d}
@@ -617,117 +654,4 @@
 		\glossaryentry{term}{asldjfdsalkf lslökaslköflsadk jlksadj lsa djlsa jdkösaljk lsdkjf lasfj asdj fdsa jfo ijsd ffdsalöjsadj ldsa jflsdajöl jdsl lsa d}
 		\glossaryentry{term}{asldjfdsalkf lslökaslköflsadk jlksadj lsa djlsa jdkösaljk lsdkjf lasfj asdj fdsa jfo ijsd ffdsalöjsadj ldsa jflsdajöl jdsl lsa d}
 	\end{tabular}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	%TODO
-	\iffalse%Excludes rest of paper
-	\section{OLD STUFF}
-	\subsubsection{Image Generation}
-	%take advantage of data arrangement, since sorted in clusters and levels and thus by precision
-	%naive algorithm: search for nearest datapoint
-	A less vital but still important aspect of my work is the visualization of the data. It is crucial to consider the way the data is stored when performing access-intense tasks, such as this. A more naive approach of mine search the whole dataset for each pixel colored, resulting in abysmal performance. By using a more sophisticated algorithm, the data can be directly mapped to the image without searching long for it. This section will go sequentially through all the steps taken.
-	\paragraph{Image Parameters}
-	\begin{figure}
-		\centering
-		\caption{Function Signature to create images}
-		\label{fig:image_signature}
-		\begin{verbatim}
-		public Screen createScreen(int minPixelWidth, int minPixelHeight, Region region,
-		                int threads, long maxWaitingTime)
-		\end{verbatim}
-	\end{figure}
-	To know what type of image the program has to create, parameters have to be passed to the function called. As seen in figure \ref{fig:image_signature}, the first two refer to the (minimal) image constraints in pixels, \verb|region| describes the region of the fractal to render. \verb|threads| indicates the maximal, although not minimal, amount of CPU threads used to create the image, and \verb|maxWaitingTime| indicates how long the image creation can take before it is aborted to avoid blocking the application in case of an error, infinty loop or deadlock (although neither is likely to happen at all).\\
-	The returned \verb|Screen| has at least the dimensions given by the parameters, but is very likely to surpass them. Due to the mapping of the pixels the actually displayed region might vary by at most a single pixel, but I have deemed that negligible.	
-	\paragraph{Preparing the rendered Area}
-	In figure \ref{fig:region_over_dataset}, the starting point of the problem is visible. A clip of the dataset has to be mapped onto the red region. Using the given dimensions of the red area, the necessary precision of the datapoints can be derived. Through the precision, we can calculate the necessary level and get the smallest logic region which can fit the red area inside it (figure \ref{fig:logic_region_over_dataset}). The logic region is needed to know from which level and place (index to be exact) in the dataset the data has to be queried, rending a long search for the datapoints redundant. The precision of the level is always better or equal to the precision of the requested image.	
-	\begin{figure}
-	\centering
-	\caption{The dataset region(black) and the requested region (red)}
-	\label{fig:region_over_dataset}
-		\begin{tikzpicture}
-			\draw[ultra thick,black, step=.5] (0,0) rectangle (4,3.5);
-			\draw[ultra thick,red] (0.6, .6) rectangle (3.1, 2.8);
-		\end{tikzpicture}
-	\end{figure}
-	
-	\begin{figure}
-		\centering
-		\caption{The level, its clusters and the logic region in green}
-		\label{fig:logic_region_over_dataset}
-		\begin{tikzpicture}
-			\draw[ultra thick,black, step=.5] (0,0) grid (4, 3.5);
-			\draw[ultra thick,red] (0.6, .6) rectangle (3.1, 2.8);
-			\draw[ultra thick, green] (.5, .5) rectangle(3.5,3);
-		\end{tikzpicture}
-	\end{figure}
-	\paragraph{Image allocation}
-	Instead of allocating an empty image with the specified dimensions and filling it directly with data, the allocated image has the dimensions of the logical area. I have illustrated this in figure \ref{fig:logic_region_and_requested_area}. The logic cluster width and height are both 5, the logical area has the width and height of 3. The requested area lies unaligned with the rest in the middle, with a width of 5 and a height of 6. As seen in the image, the region where data is fetched from has a greater precision as the red requested area; The values in the dataset lie closer to each other than in the area.\\
-	Following this example, the allocated image width is the logical cluster width times the logical region width (\(4 \times 5 = 20\)), and the image height is the logical cluster height times the logical area height (\(4 \times 6 = 24\)). The dimensions are measured in pixels. After it has been created, it can be immediately filled with data , which is a rather easy process since the pixels are by definition perfectly aligned with the data. In my program, this interim result is called \verb|ImageResult| and is cached for later usage(see section \ref{par:paragraph_image_creation_buffering}) \\
-	After the image has been populated by the values, it can be cropped to the requested area. But as seen in figure \ref{fig:cropping the area}, the cropped image's properties are not as requested. The image is wider and taller than asked for, but this is a rather minor problem since it does not degrade the quality and can be easily corrected by scaling the image down. A bigger problem regarding the accuracy is that the returned clipping is slightly bigger than requested.
-	
-	\begin{figure}
-		\centering
-		\caption{The logical area (green) with clusters and values (blue), and the requested region (red) with pixels}
-		\label{fig:logic_region_and_requested_area}
-		\begin{tikzpicture}
-			\draw[|-|,green] (0, -.3) -- (1.5, -.3) node[below] {Logical Width: 3}-- (3, -.3);
-			\draw[|-|,green] (-.3, 0) -- (-.3, 1.5) node[left] {Logical Height: 3}-- (-.3, 3);
-			
-			\draw[|-|,red] (0.4, 3.3) -- (1.4, 3.3) node[above] {Logical Width: 5}-- (2.4, 3.3);
-			\draw[|-|,red] (3.3, 0.4)-- (3.3, 1.6) node[right] {Logical Height: 6}-- (3.3, 2.8);
-			
-			\draw[|-|,blue] (2, 3.15) -- (2.5, 3.15) -- (3, 3.8) node[above] {Logical Width: 4} -- (2.5,3.15)-- (3, 3.15);
-			\draw[|-|,blue] (3.5, 2)-- (3.5, 2.5) node[right] {Logical Height: 4}-- (3.5, 3);
-			
-			\foreach \x in {0,1,2} {
-				\foreach \y in {0,1,2} {
-					\draw[blue, step=.25] (\x, \y) grid (\x +1, \y + 1);
-				}
-			};
-			\draw[ultra thick, green, step=1, opacity=.9] (0, 0) grid (3,3);
-			\draw[thick, red, step=.4] (0.4, 0.4) grid (0.4 + .4 * 5, 0.4 + .4 * 6);
-		\end{tikzpicture}
-	\end{figure}
-	
-	\begin{figure}
-		\centering
-		\caption{Cropping the image to the area given by the parameters}
-		\label{fig:cropping the area}
-		\begin{tikzpicture}			
-		\foreach \x in {0,1,2} {
-			\foreach \y in {0,1,2} {
-				\draw[blue, step=.25] (\x, \y) grid (\x +1, \y + 1);
-			}
-		};
-		\draw[ultra thick, green, step=1, opacity=.9] (0, 0) grid (3,3);
-		\draw[thick, red, step=.4] (0.4, 0.4) grid (0.4 + .4 * 5, 0.4 + .4 * 6);
-		
-		\draw[->, blue] (3.2, 1.5) -- (3.8, 1.5);
-		\draw[blue, step=.25] (4.24999, .25) grid (4 + 2.5, 3);
-		\draw[thick, red, step=.4] (4.3999, 0.4) grid (4.4 + .4 * 5, 0.4 + .4 * 6);
-		
-		\end{tikzpicture}
-	\end{figure}
-	
-	\paragraph{Buffering} \label{par:paragraph_image_creation_buffering}
-	As mentioned above, generated \verb|ImageResult|s are cached for further usage. The reason becomes quite clear when thinking of the usual navigation in fractals. The user will often slowly zoom into a section of the set. This means for the render engine that it will create many images with a nearly identical area, thus being in the same logical area. Hence having a buffer filled with previously generated \verb|ImageResult|s can reduce the rendering time by much. Searching the buffer for a match takes place after knowing the logical area an image needs to be rendered. It is then checked against every entry in it, and if a suitable \verb|ImageResult| is found, it is taken and used instead of creating a new one from scratch. If this is not the case, a new \verb|ImageResult| has to strenuously be created and is afterwards added to the buffer.\\
-	An issue encountered with buffering is the increasing RAM usage. Since the buffer contains only data which can be recreated at medium cost, it is not necessary to let it grow infinitely. Limiting its size leads to less RAM usage, but potentially a higher performance impact.\\ The buffer is only useful in cases where the roughly the same area is rendered often, such as zooming in or moving our a little. As soon as the area is moved around or zoomed in too much, thus requiring a new logical area or new depth respectively, a new \verb|ImageResult| has to be created.
-
-	\fi
 \end{document}
